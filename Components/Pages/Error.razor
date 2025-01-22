@@ -1,16 +1,29 @@
-﻿@page "/Error/{statusCode:int}"
+﻿@page "/Error"
+@page "/Error/{errorCode:int}"
 
 @using GimpiesBlazor.Handlers
 
 <PageTitle>Error</PageTitle>
 
-<MudPaper Height="400px" Width="100%">
-    <MudContainer MaxWidth="MaxWidth.Small">
-        <MudPaper Height="400px" Width="100%" Square="true" Class="mud-theme-primary"></MudPaper>
-    </MudContainer>
-</MudPaper>
+<MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 100vh;">
+    <MudItem xs="12" sm="8" md="6" lg="4">
+        <MudPaper Class="pa-4" Elevation="4">
+            <MudText Typo="Typo.h4" Align="Align.Center">Foutcode: @errorCode</MudText>
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mt-2">
+                @_errorMessage
+            </MudAlert>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 @code {
     [Parameter]
-    public int StatusCode { get; set; }
+    public int errorCode { get; set; }
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        _errorMessage = errorCode > 10 ? ErrorHandler.GetErrorMessage(errorCode) :
+            ErrorHandler.GetErrorMessage(ErrorHandler.GetProgramError(errorCode));
+    }
 }
