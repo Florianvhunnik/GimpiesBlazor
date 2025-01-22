@@ -20,6 +20,10 @@ namespace GimpiesBlazor.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<RolePermission>()
+                .HasKey(rp => new { rp.FkRoleId, rp.FkPermissionId });
+
+
             // Max lengths
             //modelBuilder.Entity<Account>().Property(a => a.Username).HasMaxLength(50);
             //modelBuilder.Entity<Account>().Property(a => a.Email).HasMaxLength(50);

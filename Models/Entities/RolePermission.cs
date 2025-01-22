@@ -5,10 +5,10 @@ namespace GimpiesBlazor.Models.Entities
 {
     public class RolePermission
     {
-        [ForeignKey(nameof(Role))]
+        [Key, ForeignKey(nameof(Role))]
         public int FkRoleId { get; set; }
 
-        [ForeignKey(nameof(Permission))]
+        [Key, ForeignKey(nameof(Permission))]
         public int FkPermissionId { get; set; }
 
         public virtual required Role Role { get; set; }
