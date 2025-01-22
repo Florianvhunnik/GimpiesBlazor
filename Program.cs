@@ -6,6 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MudBlazor services
 builder.Services.AddMudServices();
 
+// Authorization
+builder.Services.AddAuthorization(config =>
+{
+    foreach (var permission in Authorization.GetPermissions())
+    {
+        config.AddPolicy(permission, cfg => cfg.RequireClaim(permission, "true"));
+    }
+});
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
