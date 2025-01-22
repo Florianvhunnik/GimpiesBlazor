@@ -1,5 +1,6 @@
 using MudBlazor.Services;
 using GimpiesBlazor.Components;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,18 @@ builder.Services.AddAuthorization(config =>
         config.AddPolicy(permission, cfg => cfg.RequireClaim(permission, "true"));
     }
 });
+
+// Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+{
+    options.Cookie.Name = "GimpiesAuth";
+    options.LoginPath = "/login";
+    options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
+    options.AccessDeniedPath = "/error/403";
+});
+
 // Add services to the container.
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
