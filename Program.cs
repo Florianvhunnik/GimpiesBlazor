@@ -3,6 +3,7 @@ using GimpiesBlazor.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using GimpiesBlazor.Data;
 using Microsoft.EntityFrameworkCore;
+using GimpiesBlazor.Managers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<AppDbContext>();
+builder.Services.AddScoped<SessionManager>();
+builder.Services.AddScoped<AccountManager>();
 
 var app = builder.Build();
 
