@@ -9,25 +9,23 @@
     <MudItem xs="12" sm="8" md="6" lg="4">
         <MudPaper Class="pa-4" Style="text-align: center;">
             <MudText Typo="Typo.h5">Er is een fout opgetreden (@ErrorCode)</MudText>
-            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mt-4">
-                <MudText>@_errorMessage</MudText>
-            </MudAlert>
+             <MudText>@_errorMessage</MudText>
             
             @if (SessionManager.IsLoggedIn)
             {
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/dashboard">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" Href="/dashboard" StartIcon="@Icons.Material.Filled.Dashboard">
                     Dashboard
                 </MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/logout">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-2" Href="/logout" StartIcon="@Icons.Material.Filled.ExitToApp">
                     Uitloggen
                 </MudButton>
             }
             else
             {
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/login">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" Href="/login" StartIcon="@Icons.Material.Filled.Login">
                     Inloggen
                 </MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/registreren">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-2" Href="/registreren" StartIcon="@Icons.Material.Filled.PersonAdd">
                     Registreren
                 </MudButton>
             }
