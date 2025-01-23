@@ -24,7 +24,6 @@
 
 
   <ItemGroup>
-    <Folder Include="Components\Pages\LoggedIn\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 </Project>
