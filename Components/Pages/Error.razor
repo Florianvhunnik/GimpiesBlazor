@@ -1,29 +1,49 @@
-﻿@page "/Error"
-@page "/Error/{errorCode:int}"
+﻿@page "/error/{ErrorCode:int}"
 
 @using GimpiesBlazor.Handlers
+@using GimpiesBlazor.Managers
 
 <PageTitle>Error</PageTitle>
 
 <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 100vh;">
     <MudItem xs="12" sm="8" md="6" lg="4">
-        <MudPaper Class="pa-4" Elevation="4">
-            <MudText Typo="Typo.h4" Align="Align.Center">Foutcode: @errorCode</MudText>
-            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mt-2">
-                @_errorMessage
+        <MudPaper Class="pa-4" Style="text-align: center;">
+            <MudText Typo="Typo.h5">Er is een fout opgetreden (@ErrorCode)</MudText>
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mt-4">
+                <MudText>@_errorMessage</MudText>
             </MudAlert>
+            
+            @if (SessionManager.IsLoggedIn)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/dashboard">
+                    Dashboard
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/logout">
+                    Uitloggen
+                </MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/login">
+                    Inloggen
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" Href="/registreren">
+                    Registreren
+                </MudButton>
+            }
         </MudPaper>
     </MudItem>
 </MudGrid>
 
+
 @code {
     [Parameter]
-    public int errorCode { get; set; }
+    public int ErrorCode { get; set; }
     private string? _errorMessage;
 
     protected override void OnInitialized()
     {
-        _errorMessage = errorCode > 10 ? ErrorHandler.GetErrorMessage(errorCode) :
-            ErrorHandler.GetErrorMessage(ErrorHandler.GetProgramError(errorCode));
+        _errorMessage = ErrorCode > 10 ? ErrorHandler.GetErrorMessage(ErrorCode) :
+            ErrorHandler.GetErrorMessage(ErrorHandler.GetProgramError(ErrorCode));
     }
 }
