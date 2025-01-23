@@ -2,6 +2,30 @@
 @page "/login"
 
 <PageTitle>Login</PageTitle>
+<MudPaper Class="pa-4 mx-auto" MaxWidth="400px">
+    <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Login</MudText>
+    <MudForm Model="Model" OnInvalidSubmit="async () => await Authenticate()">
+        <MudTabs @bind-ActivePanelIndex="_activeTab" Class="mt-4" Centered="true">
+            <MudTabPanel Text="Gebruikersnaam">
+                <MudTextField @bind-Value="Model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidUsername))" />
+            </MudTabPanel>
+            <MudTabPanel Text="E-mail">
+                <MudTextField @bind-Value="Model.Email" Label="E-Mail" Required="true" RequiredError="Vul uw E-Mail in" InputType="InputType.Email"
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidEmail))" />
+            </MudTabPanel>
+        </MudTabs>
+
+        <MudTextField @bind-Value="Model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
+                      Validation="@(new Func<string, IEnumerable<string>>(ValidPassword))" />
+
+        <MudButton Type="Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Inloggen</MudButton>
+    </MudForm>
+
+    <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-4">
+        Nog geen account? <MudLink Href="/registreren" Color="Color.Primary">Registreer hier</MudLink>
+    </MudText>
+</MudPaper>
 
 @code {
 
