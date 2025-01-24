@@ -1,5 +1,4 @@
-﻿using GimpiesBlazor.Models.ViewModels;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace GimpiesBlazor.Managers

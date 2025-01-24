@@ -2,6 +2,7 @@
 using GimpiesBlazor.Data;
 using GimpiesBlazor.Handlers;
 using GimpiesBlazor.Models.Entities;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -77,7 +78,7 @@ namespace GimpiesBlazor.Managers
 
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new InvalidOperationException("Er is een fout opgetreden bij het ophalen van een account!");
             }
@@ -95,6 +96,11 @@ namespace GimpiesBlazor.Managers
             {
                 throw new InvalidOperationException("Er is een fout opgetreden bij het ophalen van een account!");
             }
+        }
+
+        public void LogoutUser()
+        {
+            
         }
     }
 }
