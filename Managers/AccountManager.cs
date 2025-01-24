@@ -77,7 +77,7 @@ namespace GimpiesBlazor.Managers
 
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
                 throw new InvalidOperationException("Er is een fout opgetreden bij het ophalen van een account!");
             }
