@@ -1,6 +1,14 @@
 ﻿
 <MudNavMenu>
-    <MudNavLink Href="dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Dashboard</MudNavLink>
+    <AuthorizeView Roles="user, sale, purchase, manager">
+        <Authorized>
+            <MudNavLink Href="dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Dashboard</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="manager">
+        <Authorized>
+            <MudNavLink Href="dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Manager</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
 </MudNavMenu>
-
-

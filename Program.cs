@@ -5,6 +5,9 @@ using GimpiesBlazor.Data;
 using Microsoft.EntityFrameworkCore;
 using GimpiesBlazor.Managers;
 using MudBlazor;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using GimpiesBlazor.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,28 +23,7 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 
-// Authorization
-builder.Services.AddAuthorization(config =>
-{
-    foreach (var permission in Authorization.GetPermissions())
-    {
-        config.AddPolicy(permission, cfg => cfg.RequireClaim(permission, "true"));
-    }
-});
-
-// Authentication
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
-{
-    options.Cookie.Name = "GimpiesAuth";
-    options.LoginPath = "/login";
-    options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
-    options.AccessDeniedPath = "/error/403";
-});
-
 // Add services to the container.
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
@@ -49,14 +31,27 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddAuthentication(options => {
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    }).AddCookie(options =>
+        {
+            options.Cookie.Name = "GimpiesBlazor";
+            options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            options.LoginPath = "/login";
+            options.LogoutPath = "/logout";
+            options.AccessDeniedPath = "/error/403";
+        });
+
+builder.Services.AddAuthenticationCore();
+
 builder.Services.AddScoped<AppDbContext>();
 builder.Services.AddScoped<SessionManager>();
 builder.Services.AddScoped<AccountManager>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 var app = builder.Build();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

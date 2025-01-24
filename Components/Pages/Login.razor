@@ -1,58 +1,64 @@
 ﻿@page "/"
 @page "/login"
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 @inject AccountManager AccountManager
 @inject NavigationManager NavigationManager
-@inject IHttpContextAccessor HttpContextAccessor
 @inject ISnackbar Snackbar
+@inject AuthenticationStateProvider authStateProvider
 
 @using System.Security.Claims
+@using GimpiesBlazor.Authentication
 @using GimpiesBlazor.Data
 @using GimpiesBlazor.Handlers
 @using GimpiesBlazor.Managers
-@using GimpiesBlazor.Models.ViewModels
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Http
 
 <MudPaper Class="pa-10 mx-auto" MaxWidth="400px">
     <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Login</MudText>
-    <MudForm Model="Model">
+    <MudForm @ref="_form" Model="model">
         <MudTabs @bind-ActivePanelIndex="ActiveTab" Class="mt-4" Centered="true">
             <MudTabPanel Text="Gebruikersnaam">
-                <MudTextField @bind-Value="Model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
+                <MudTextField @bind-Value="model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
                               Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, true)))" />
             </MudTabPanel>
             <MudTabPanel Text="E-mail">
-                <MudTextField @bind-Value="Model.Email" Label="E-Mail" Required="true" RequiredError="Vul uw E-Mail in" InputType="InputType.Email"
+                <MudTextField @bind-Value="model.Email" Label="E-Mail" Required="true" RequiredError="Vul uw E-Mail in" InputType="InputType.Email"
                     Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
             </MudTabPanel>
         </MudTabs>
 
-        <MudTextField @bind-Value="Model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
+        <MudTextField @bind-Value="model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
             Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, true)))" />
 
         <MudButton OnClick="@(async () => await Authenticate())" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Inloggen</MudButton>
     </MudForm>
 
     <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-4">
-        Nog geen account? <MudLink Href="/registreren" Color="Color.Primary">Registreer hier</MudLink>
+        Nog geen account? <MudLink Href="/register" Color="Color.Primary">Registreer hier</MudLink>
     </MudText>
 </MudPaper>
 
 @code {
-    [SupplyParameterFromForm]
-    public LoginViewModel Model { get; set; } = new();
-
     private int ActiveTab { get; set; } = 0;
+    private MudForm? _form { get; set; }
 
-    private MarkupString? _notifyMessage;
+    private class Model()
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Role { get; set; }
+    }
+
+    private Model model = new Model();
 
     private async Task Authenticate()
     {
-        var input = ActiveTab == 0 ? Model.Username : Model.Email;
+        var input = ActiveTab == 0 ? model.Username : model.Email;
 
-        if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(Model.Password))
+        if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(model.Password))
         {
             Snackbar.Add("Vul alle velden correct in!", Severity.Warning);
             return;
@@ -60,7 +66,7 @@
 
         try
         {
-            var account = await AccountManager.CheckAccountAsync(input, Model.Password);
+            var account = await AccountManager.CheckAccountAsync(input, model.Password);
 
             if (account is null)
             {
@@ -70,29 +76,20 @@
 
             SessionManager.SetAccount(account);
 
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.Name, account.Username),
-            };
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
 
-            foreach (var permission in Authorization.GetPermissions())
-            {
-                if (SessionManager.HasPermission(permission))
+            await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession
                 {
-                    claims.Add(new Claim(permission, "true"));
-                }
-            }
+                    Username = account.Username,
+                    Email = account.Email,
+                    Role = account.Role.RoleName
+                });
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContextAccessor.HttpContext!.SignInAsync(principal);
-
-            NavigationManager.NavigateTo("/dashboard");
+            NavigationManager.NavigateTo("/dashboard", true);
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException ex)
         {
-            _notifyMessage = ErrorHandler.AddErrorCode("Er is een fout opgetreden bij het inloggen!", ProgramError.DatabaseError);
+            Console.WriteLine($"OORZAAK db: {ex.Message}");
             Snackbar.Add("Er is een fout opgetreden bij het inloggen!", Severity.Error, options =>
             {
                 options.Action = "Meer info";
@@ -104,9 +101,22 @@
             });
 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            _notifyMessage = ErrorHandler.AddErrorCode("Er is een fout opgetreden bij het inloggen!", ProgramError.UnknownError);
+            Console.WriteLine($"OORZAAK: {ex.ToString()}");
+            Snackbar.Add("Er is een fout opgetreden bij het inloggen!", Severity.Error, options =>
+            {
+                options.Action = "Meer info";
+                options.OnClick = snackbar =>
+                {
+                    NavigationManager.NavigateTo("/error/" + (int)ProgramError.UnknownError);
+                    return Task.CompletedTask;
+                };
+            });
+        }
+        finally
+        {
+            await _form!.ResetAsync();
         }
     }
 }

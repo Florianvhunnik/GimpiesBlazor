@@ -1,3 +1,20 @@
 ﻿@page "/dashboard"
+@attribute [Authorize(Roles = "user, sale, purchase, manager")]
+
+@using Microsoft.AspNetCore.Authorization
+
 
 <PageTitle>Dashboard</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="6" md="4" lg="3">
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Welkom!</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText Typo="Typo.body1">Welkom op de dashboard!</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
