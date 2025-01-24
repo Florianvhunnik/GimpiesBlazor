@@ -6,10 +6,12 @@ namespace GimpiesBlazor.Managers
 {
     public class ValidationManager
     {
-        public static IEnumerable<string> ValidPassword(string password)
+        public static IEnumerable<string> ValidPassword(string password, bool login)
         {
             if (string.IsNullOrWhiteSpace(password))
                 yield return "Vul uw wachtwoord in";
+            if (login)
+                yield break;
             if (password.Length < 8)
                 yield return "Wachtwoord moet minimaal 8 tekens bevatten";
             if (!Regex.IsMatch(password, @"[a-z]"))
@@ -20,12 +22,14 @@ namespace GimpiesBlazor.Managers
                 yield return "Wachtwoord moet minimaal 1 cijfer bevatten";
         }
 
-        public static IEnumerable<string> ValidUsername(string username)
+        public static IEnumerable<string> ValidUsername(string username, bool login)
         {
             if (string.IsNullOrWhiteSpace(username))
                 yield return "Vul uw gebruikersnaam in";
-            if (username.Length < 8)
-                yield return "Gebruikersnaam moet minimaal 8 tekens bevatten";
+            if (login)
+                yield break;
+            if (username.Length < 5)
+                yield return "Gebruikersnaam moet minimaal 5 tekens bevatten";
             if (Regex.IsMatch(username, @"[0-9]"))
                 yield return "Gebruikersnaam mag geen cijfers bevatten";
             if (Regex.IsMatch(username, @"[^\w\.@-]"))
