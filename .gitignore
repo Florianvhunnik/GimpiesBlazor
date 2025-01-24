@@ -45,3 +45,6 @@ wwwroot/css/app.min.css.map
 # Azure Pipelines
 .azure/
 appsettings.json
+
+# Migrations 
+Migrations/
