@@ -1,5 +1,5 @@
-﻿@page "/registreren"
-@rendermode InteractiveAuto
+﻿@page "/register"
+@rendermode InteractiveServer
 @inject AccountManager AccountManager
 @inject NavigationManager NavigationManager
 @inject IHttpContextAccessor HttpContextAccessor
@@ -10,7 +10,6 @@
 @using GimpiesBlazor.Data
 @using GimpiesBlazor.Handlers
 @using GimpiesBlazor.Managers
-@using GimpiesBlazor.Models.ViewModels
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Http
@@ -18,15 +17,15 @@
 
 <MudPaper Class="pa-10 mx-auto" MaxWidth="400px">
     <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Registreren</MudText>
-    <MudForm Model="Model">
-        <MudTextField @bind-Value="Model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
+    <MudForm @ref="_form" Model="model">
+        <MudTextField @bind-Value="model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
                       Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, false)))" />
-        <MudTextField @bind-Value="Model.Email" Label="E-Mail" InputType="InputType.Email" Required="true" RequiredError="Vul uw e-mailadres in"
+        <MudTextField @bind-Value="model.Email" Label="E-Mail" InputType="InputType.Email" Required="true" RequiredError="Vul uw e-mailadres in"
             Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
-        <MudTextField @bind-Value="Model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
+        <MudTextField @bind-Value="model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
             Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, false)))" />
-        <MudTextField @bind-Value="Model.PasswordRepeat" Label="Bevestig Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Bevestig uw wachtwoord"
-            Validation="@(new Func<string, IEnumerable<string>>(value => ValidationManager.MatchPassword(Model.Password, value)))" />
+        <MudTextField @bind-Value="model.PasswordRepeat" Label="Bevestig Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Bevestig uw wachtwoord"
+                      Validation="@(new Func<string, IEnumerable<string>>(value => ValidationManager.MatchPassword(model.Password, value)))" />
 
         <MudButton OnClick="@(async () => await RegisterUser())" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Registreren</MudButton>
     </MudForm>
@@ -37,24 +36,33 @@
 </MudPaper>
 
 @code {
-    [SupplyParameterFromForm]
-    public RegisterViewModel Model { get; set; } = new();
 
     private MarkupString? _notifyMessage;
+    private MudForm? _form;
+
+    private class Model()
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string PasswordRepeat { get; set; }
+    }
+
+    private Model model = new Model();
 
     private async Task RegisterUser()
     {
-        if (string.IsNullOrEmpty(Model.Username) || string.IsNullOrEmpty(Model.Email) || string.IsNullOrEmpty(Model.Password) || string.IsNullOrEmpty(Model.PasswordRepeat))
+        if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.PasswordRepeat))
         {
             Snackbar.Add("Vul alle velden correct in!", Severity.Warning);
             return;
         } 
-        if (Model.Password != Model.PasswordRepeat)
+        if (model.Password != model.PasswordRepeat)
         {
             Snackbar.Add("Wachtwoorden komen niet overeen!", Severity.Warning);
             return;
         }
-        if (!Model.Email.Contains("@") || !Model.Email.Contains("."))
+        if (!model.Email.Contains("@") || !model.Email.Contains("."))
         {
             Snackbar.Add("Vul een geldig e-mailadres in!", Severity.Warning);
             return;
@@ -62,7 +70,7 @@
 
         try
         {
-            var account = await AccountManager.GetAccount(Model.Username, Model.Email);
+            var account = await AccountManager.GetAccount(model.Username, model.Email);
 
             if (account != null)
             {
@@ -78,7 +86,7 @@
             }
             else
             {
-                await AccountManager.RegisterUserAsync(Model.Username, Model.Email, Model.Password, "user");
+                await AccountManager.RegisterUserAsync(model.Username, model.Email, model.Password, "user");
 
                 Snackbar.Add("Succesvol geregistreerd!", Severity.Success, options =>
                 {
@@ -93,11 +101,31 @@
         }
         catch (InvalidOperationException)
         {
-            _notifyMessage = ErrorHandler.AddErrorCode("Er is een fout opgetreden bij het registreren!", ProgramError.DatabaseError);
+            Snackbar.Add("Er is een fout opgetreden bij het registreren!", Severity.Error, options =>
+            {
+                options.Action = "Meer info";
+                options.OnClick = snackbar =>
+                {
+                    NavigationManager.NavigateTo("/error/" + (int)ProgramError.DatabaseError);
+                    return Task.CompletedTask;
+                };
+            });
         }
         catch (Exception)
         {
-            _notifyMessage = ErrorHandler.AddErrorCode("Er is een fout opgetreden bij het registreren!", ProgramError.UnknownError);
+            Snackbar.Add("Er is een fout opgetreden bij het registreren!", Severity.Error, options =>
+            {
+                options.Action = "Meer info";
+                options.OnClick = snackbar =>
+                {
+                    NavigationManager.NavigateTo("/error/" + (int)ProgramError.UnknownError);
+                    return Task.CompletedTask;
+                };
+            });
+        }
+        finally
+        {
+            await _form!.ResetAsync();
         }
     }
 }
