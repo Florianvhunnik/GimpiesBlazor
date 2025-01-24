@@ -1,8 +1,9 @@
 ﻿@page "/registreren"
-@rendermode InteractiveServer
+@rendermode InteractiveAuto
 @inject AccountManager AccountManager
 @inject NavigationManager NavigationManager
 @inject IHttpContextAccessor HttpContextAccessor
+@inject ISnackbar Snackbar
 
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
@@ -17,33 +18,22 @@
 
 <MudPaper Class="pa-10 mx-auto" MaxWidth="400px">
     <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Registreren</MudText>
-    <MudForm Model="Model" OnValidSubmit="async () => await RegisterUser()">
+    <MudForm Model="Model">
         <MudTextField @bind-Value="Model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
-                      Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidUsername))" />
+                      Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, false)))" />
         <MudTextField @bind-Value="Model.Email" Label="E-Mail" InputType="InputType.Email" Required="true" RequiredError="Vul uw e-mailadres in"
-                      Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
+            Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
         <MudTextField @bind-Value="Model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
-                      Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidPassword))" />
+            Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, false)))" />
         <MudTextField @bind-Value="Model.PasswordRepeat" Label="Bevestig Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Bevestig uw wachtwoord"
-                      Validation="@(new Func<string, IEnumerable<string>>(value => ValidationManager.MatchPassword(Model.Password, value)))" />
+            Validation="@(new Func<string, IEnumerable<string>>(value => ValidationManager.MatchPassword(Model.Password, value)))" />
 
-        <MudButton Type="Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Registreren</MudButton>
+        <MudButton OnClick="@(async () => await RegisterUser())" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Registreren</MudButton>
     </MudForm>
 
     <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-4">
         Heb je al een account? <MudLink Href="/login" Color="Color.Primary">Inloggen</MudLink>
     </MudText>
-
-    <div class="mb-3 text-center">
-        <span class="text-danger">@_notifyMessage</span>
-    </div>
-
-    @if (_notifyMessage == null)
-    {
-        <div>
-            Notify is null
-        </div>
-    }
 </MudPaper>
 
 @code {
@@ -55,14 +45,20 @@
     private async Task RegisterUser()
     {
         if (string.IsNullOrEmpty(Model.Username) || string.IsNullOrEmpty(Model.Email) || string.IsNullOrEmpty(Model.Password) || string.IsNullOrEmpty(Model.PasswordRepeat))
-            _notifyMessage = new MarkupString("Vul alle velden correct in!");
+        {
+            Snackbar.Add("Vul alle velden correct in!", Severity.Warning);
             return;
+        } 
         if (Model.Password != Model.PasswordRepeat)
-            _notifyMessage = new MarkupString("Wachtwoorden komen niet overeen!");
+        {
+            Snackbar.Add("Wachtwoorden komen niet overeen!", Severity.Warning);
             return;
+        }
         if (!Model.Email.Contains("@") || !Model.Email.Contains("."))
-            _notifyMessage = new MarkupString("Vul een geldig e-mailadres in!");
+        {
+            Snackbar.Add("Vul een geldig e-mailadres in!", Severity.Warning);
             return;
+        }
 
         try
         {
@@ -70,14 +66,29 @@
 
             if (account != null)
             {
-                _notifyMessage = new MarkupString(
-                    $"Deze gebruikersnaam en / of E-Mail is al in gebruik! (<a href='/login'>Inloggen</a>)");
+                Snackbar.Add("Deze gebruikersnaam en / of E-Mail is al in gebruik!", Severity.Warning, options =>
+                {
+                    options.Action = "Inloggen";
+                    options.OnClick = snackbar =>
+                    {
+                        NavigationManager.NavigateTo("/login");
+                        return Task.CompletedTask;
+                    };
+                });
             }
             else
             {
                 await AccountManager.RegisterUserAsync(Model.Username, Model.Email, Model.Password, "user");
-                _notifyMessage = new MarkupString(
-                    $"Succesvol geregistreerd! (<a href='/login'>Inloggen</a>)");
+
+                Snackbar.Add("Succesvol geregistreerd!", Severity.Success, options =>
+                {
+                    options.Action = "Inloggen";
+                    options.OnClick = snackbar =>
+                    {
+                        NavigationManager.NavigateTo("/login");
+                        return Task.CompletedTask;
+                    };
+                });
             }
         }
         catch (InvalidOperationException)
