@@ -4,8 +4,8 @@
 @inject AccountManager AccountManager
 @inject NavigationManager NavigationManager
 @inject IHttpContextAccessor HttpContextAccessor
+@inject ISnackbar Snackbar
 
-@using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
 @using GimpiesBlazor.Data
 @using GimpiesBlazor.Handlers
@@ -14,26 +14,25 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Http
-@using System.Text.RegularExpressions
 
 <MudPaper Class="pa-10 mx-auto" MaxWidth="400px">
     <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Login</MudText>
-    <MudForm Model="Model" OnInvalidSubmit="async () => await Authenticate()">
-        <MudTabs @bind-ActivePanelIndex="_activeTab" Class="mt-4" Centered="true">
+    <MudForm Model="Model">
+        <MudTabs @bind-ActivePanelIndex="ActiveTab" Class="mt-4" Centered="true">
             <MudTabPanel Text="Gebruikersnaam">
                 <MudTextField @bind-Value="Model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidUsername))" />
+                              Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, true)))" />
             </MudTabPanel>
             <MudTabPanel Text="E-mail">
                 <MudTextField @bind-Value="Model.Email" Label="E-Mail" Required="true" RequiredError="Vul uw E-Mail in" InputType="InputType.Email"
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
+                    Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
             </MudTabPanel>
         </MudTabs>
 
         <MudTextField @bind-Value="Model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
-                      Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidPassword))" />
+            Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, true)))" />
 
-        <MudButton Type="Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Inloggen</MudButton>
+        <MudButton OnClick="@(async () => await Authenticate())" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Inloggen</MudButton>
     </MudForm>
 
     <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-4">
@@ -45,17 +44,17 @@
     [SupplyParameterFromForm]
     public LoginViewModel Model { get; set; } = new();
 
-    private int _activeTab { get; set; } = 0;
+    private int ActiveTab { get; set; } = 0;
 
     private MarkupString? _notifyMessage;
 
     private async Task Authenticate()
     {
-        var input = _activeTab == 0 ? Model.Username : Model.Email;
+        var input = ActiveTab == 0 ? Model.Username : Model.Email;
 
         if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(Model.Password))
         {
-            _notifyMessage = new MarkupString("Vul alle velden correct in!");
+            Snackbar.Add("Vul alle velden correct in!", Severity.Warning);
             return;
         }
 
@@ -65,7 +64,7 @@
 
             if (account is null)
             {
-                _notifyMessage = new MarkupString("Één of meerdere inloggegevens onjuist!");
+                Snackbar.Add("Één of meerdere inloggegevens onjuist!", Severity.Warning);
                 return;
             }
 
@@ -94,6 +93,16 @@
         catch (InvalidOperationException)
         {
             _notifyMessage = ErrorHandler.AddErrorCode("Er is een fout opgetreden bij het inloggen!", ProgramError.DatabaseError);
+            Snackbar.Add("Er is een fout opgetreden bij het inloggen!", Severity.Error, options =>
+            {
+                options.Action = "Meer info";
+                options.OnClick = snackbar =>
+                {
+                    NavigationManager.NavigateTo("/error/" + (int)ProgramError.DatabaseError);
+                    return Task.CompletedTask;
+                };
+            });
+
         }
         catch (Exception)
         {
