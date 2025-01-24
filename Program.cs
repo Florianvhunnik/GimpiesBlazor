@@ -4,11 +4,21 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using GimpiesBlazor.Data;
 using Microsoft.EntityFrameworkCore;
 using GimpiesBlazor.Managers;
+using MudBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
+    config.SnackbarConfiguration.PreventDuplicates = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 4000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+});
 
 // Authorization
 builder.Services.AddAuthorization(config =>
