@@ -1,19 +1,13 @@
-﻿@page "/"
-@page "/login"
-@rendermode InteractiveAuto
+﻿@page "/login"
 @inject AccountManager AccountManager
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider authStateProvider
 
-@using System.Security.Claims
 @using GimpiesBlazor.Authentication
 @using GimpiesBlazor.Data
 @using GimpiesBlazor.Handlers
 @using GimpiesBlazor.Managers
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authentication.Cookies
-@using Microsoft.AspNetCore.Http
 
 <MudPaper Class="pa-10 mx-auto" MaxWidth="400px">
     <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Login</MudText>
@@ -21,7 +15,7 @@
         <MudTabs @bind-ActivePanelIndex="ActiveTab" Class="mt-4" Centered="true">
             <MudTabPanel Text="Gebruikersnaam">
                 <MudTextField @bind-Value="model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
-                              Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, true)))" />
+                    Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, true)))" />
             </MudTabPanel>
             <MudTabPanel Text="E-mail">
                 <MudTextField @bind-Value="model.Email" Label="E-Mail" Required="true" RequiredError="Vul uw E-Mail in" InputType="InputType.Email"
