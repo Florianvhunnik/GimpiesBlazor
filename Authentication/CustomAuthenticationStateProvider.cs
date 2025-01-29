@@ -39,7 +39,7 @@ namespace GimpiesBlazor.Authentication
             }
         }
 
-        public async Task UpdateAuthenticationState(UserSession userSession)
+        public async Task UpdateAuthenticationState(UserSession? userSession)
         {
             ClaimsPrincipal claimsPrincipal;
 
