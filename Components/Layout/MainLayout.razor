@@ -1,5 +1,8 @@
-﻿@using GimpiesBlazor.Managers
+﻿@using GimpiesBlazor.Authentication
+@using GimpiesBlazor.Managers
 @inherits LayoutComponentBase
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
@@ -14,6 +17,7 @@
                 <MudSpacer/>
                 <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
                 <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
+                <MudLink OnClick="@Logout" Color="Color.Primary">Uitloggen</MudLink>
             </MudAppBar>
 
             <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -38,6 +42,13 @@
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
+
+    private async void Logout()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null);
+        NavigationManager.NavigateTo("/login", true);
+    }
 
     protected override void OnInitialized()
     {
