@@ -1,43 +1,43 @@
-﻿<MudNavMenu>
+﻿<MudNavMenu Color="Color.Primary" Bordered="true">
     <AuthorizeView Roles="user, sale, purchase, manager">
         <Authorized>
-            <MudNavLink Href="dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Dashboard</MudNavLink>
+            <MudNavLink Href="dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="sale, purchase, manager">
         <Authorized>
-            <MudNavLink Href="stock" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Voorraad</MudNavLink>
+            <MudNavLink Href="stock" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Inventory">Voorraad</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="purchase">
         <Authorized>
-            <MudNavLink Href="purchase" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Schoenen Inkopen</MudNavLink>
+            <MudNavLink Href="purchase" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ShoppingCart">Schoenen Inkopen</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="sale">
         <Authorized>
-            <MudNavLink Href="sale" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Schoenen Verkopen</MudNavLink>
+            <MudNavLink Href="sale" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Store">Schoenen Verkopen</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="manager">
         <Authorized>
-            <MudNavLink Href="manage_shoes" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Schoenen Beheren</MudNavLink>
+            <MudNavLink Href="manage_shoes" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts">Schoenen Beheren</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="manager">
         <Authorized>
-            <MudNavLink Href="manage_staff" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Werknemers Beheren</MudNavLink>
+            <MudNavLink Href="manage_staff" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Group">Werknemers Beheren</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="manager">
         <Authorized>
-            <MudNavLink Href="statistics" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Statistieken</MudNavLink>
+            <MudNavLink Href="statistics" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.BarChart">Statistieken</MudNavLink>
         </Authorized>
     </AuthorizeView>
 </MudNavMenu>
