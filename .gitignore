@@ -48,3 +48,4 @@ appsettings.json
 
 # Migrations 
 Migrations/
+/Migrations

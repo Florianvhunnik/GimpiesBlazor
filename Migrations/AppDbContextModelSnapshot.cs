@@ -200,6 +200,10 @@ namespace GimpiesBlazor.Migrations
                     b.Property<int>("FkColorId")
                         .HasColumnType("int");
 
+                    b.Property<string>("FkTypeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -209,10 +213,8 @@ namespace GimpiesBlazor.Migrations
                     b.Property<int>("Size")
                         .HasColumnType("int");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
 
                     b.HasKey("StockId");
 
@@ -220,7 +222,27 @@ namespace GimpiesBlazor.Migrations
 
                     b.HasIndex("FkColorId");
 
+                    b.HasIndex("TypeId");
+
                     b.ToTable("Stock");
+                });
+
+            modelBuilder.Entity("GimpiesBlazor.Models.Entities.StockType", b =>
+                {
+                    b.Property<int>("TypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("TypeId");
+
+                    b.ToTable("StockTypes");
                 });
 
             modelBuilder.Entity("GimpiesBlazor.Models.Entities.Account", b =>
@@ -286,9 +308,17 @@ namespace GimpiesBlazor.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GimpiesBlazor.Models.Entities.StockType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Brand");
 
                     b.Navigation("Color");
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("GimpiesBlazor.Models.Entities.Permission", b =>
