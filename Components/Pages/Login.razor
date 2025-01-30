@@ -3,11 +3,13 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider authStateProvider
+@attribute [AllowAnonymous]
 
 @using GimpiesBlazor.Authentication
 @using GimpiesBlazor.Data
 @using GimpiesBlazor.Handlers
 @using GimpiesBlazor.Managers
+@using Microsoft.AspNetCore.Authorization
 
 <MudPaper Class="pa-10 mx-auto" MaxWidth="400px">
     <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Login</MudText>
@@ -37,6 +39,9 @@
 @code {
     private int ActiveTab { get; set; } = 0;
     private MudForm? _form { get; set; }
+    private const int _allowedAttempts = 5;
+    private int _loginAttempts = 0;
+    private DateTime? _blockTime;
 
     private class Model()
     {
@@ -50,6 +55,19 @@
 
     private async Task Authenticate()
     {
+        if (_blockTime.HasValue && DateTime.Now < _blockTime.Value)
+        {
+            Snackbar.Add($"Je bent geblokkeerd tot {_blockTime.Value:HH:mm}. Probeer het later opnieuw.", Severity.Error);
+            return;
+        }
+
+        if (_loginAttempts >= _allowedAttempts)
+        {
+            _blockTime = DateTime.Now.AddMinutes(5);
+            Snackbar.Add("Je hebt het maximale aantal inlogpogingen bereikt. Probeer het later opnieuw.", Severity.Error);
+            return;
+        }
+
         var input = ActiveTab == 0 ? model.Username : model.Email;
 
         if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(model.Password))
@@ -64,9 +82,12 @@
 
             if (account is null)
             {
+                _loginAttempts++;
                 Snackbar.Add("Één of meerdere inloggegevens onjuist!", Severity.Warning);
                 return;
             }
+
+            _loginAttempts = 0;
 
             SessionManager.SetAccount(account);
 
@@ -80,10 +101,11 @@
                 });
 
             NavigationManager.NavigateTo("/dashboard", true);
+
+            Snackbar.Add("Succesvol ingelogd!", Severity.Success);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
-            Console.WriteLine($"OORZAAK db: {ex.Message}");
             Snackbar.Add("Er is een fout opgetreden bij het inloggen!", Severity.Error, options =>
             {
                 options.Action = "Meer info";
@@ -95,9 +117,8 @@
             });
 
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"OORZAAK: {ex.ToString()}");
             Snackbar.Add("Er is een fout opgetreden bij het inloggen!", Severity.Error, options =>
             {
                 options.Action = "Meer info";

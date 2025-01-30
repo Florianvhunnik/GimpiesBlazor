@@ -1,11 +1,11 @@
 ﻿@page "/error/{ErrorCode:int}"
-
+ 
 @using GimpiesBlazor.Handlers
 @using GimpiesBlazor.Managers
 
 <PageTitle>Error</PageTitle>
 
-<MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Style="height: 100vh;">
+<MudGrid Justify="Justify.Center" Style="height: 100vh;">
     <MudItem xs="12" sm="8" md="6" lg="4">
         <MudPaper Class="pa-4" Style="text-align: center;">
             <MudText Typo="Typo.h5">Er is een fout opgetreden (@ErrorCode)</MudText>
@@ -16,16 +16,13 @@
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" Href="/dashboard" StartIcon="@Icons.Material.Filled.Dashboard">
                     Dashboard
                 </MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-2" Href="/logout" StartIcon="@Icons.Material.Filled.ExitToApp">
-                    Uitloggen
-                </MudButton>
             }
             else
             {
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" Href="/login" StartIcon="@Icons.Material.Filled.Login">
                     Inloggen
                 </MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-2" Href="/registreren" StartIcon="@Icons.Material.Filled.PersonAdd">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-2" Href="/register" StartIcon="@Icons.Material.Filled.PersonAdd">
                     Registreren
                 </MudButton>
             }

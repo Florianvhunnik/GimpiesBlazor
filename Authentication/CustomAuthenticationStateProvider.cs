@@ -21,7 +21,7 @@ namespace GimpiesBlazor.Authentication
                 var userSessionStorageResult = await _sessionStorage.GetAsync<UserSession>("UserSession");
                 var userSession = userSessionStorageResult.Success ? userSessionStorageResult.Value : null;
 
-                if (userSession == null)
+                if (userSession is null)
                     return await Task.FromResult(new AuthenticationState(_anonymous));
 
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>

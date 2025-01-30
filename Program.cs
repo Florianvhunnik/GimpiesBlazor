@@ -31,25 +31,26 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddAuthentication(options => {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    }).AddCookie(options =>
-        {
-            options.Cookie.Name = "GimpiesBlazor";
-            options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
-            options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-            options.LoginPath = "/login";
-            options.LogoutPath = "/logout";
-            options.AccessDeniedPath = "/error/403";
-        });
-
 builder.Services.AddAuthenticationCore();
 
 builder.Services.AddScoped<AppDbContext>();
 builder.Services.AddScoped<SessionManager>();
 builder.Services.AddScoped<AccountManager>();
-builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+
+builder.Services.AddAuthentication()
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "GimpiesAuth";
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        options.AccessDeniedPath = "/error/403";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+    });
 
 var app = builder.Build();
 
@@ -65,6 +66,8 @@ app.UseStatusCodePagesWithReExecute("/error/{0}");
 
 //app.UseHttpsRedirection();
 
+app.UseAuthentication()
+    .UseAuthorization();
 
 app.UseAntiforgery();
 
