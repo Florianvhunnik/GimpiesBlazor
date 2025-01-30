@@ -14,7 +14,9 @@
             <MudAppBar Elevation="1">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
                 <MudText Typo="Typo.h5" Class="ml-3">Gimpies</MudText>
+
                 <MudSpacer/>
+
                 <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
                 <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
                 <MudLink OnClick="@Logout" Color="Color.Primary">Uitloggen</MudLink>
