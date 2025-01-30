@@ -12,9 +12,11 @@ using GimpiesBlazor.Authentication;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
+builder.Services.AddAuthenticationCore();
+
 builder.Services.AddMudServices(config =>
 {
-    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
     config.SnackbarConfiguration.PreventDuplicates = false;
     config.SnackbarConfiguration.ShowCloseIcon = true;
     config.SnackbarConfiguration.VisibleStateDuration = 4000;
@@ -31,12 +33,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddAuthenticationCore();
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddScoped<AppDbContext>();
 builder.Services.AddScoped<SessionManager>();
 builder.Services.AddScoped<AccountManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 
 builder.Services.AddAuthentication()

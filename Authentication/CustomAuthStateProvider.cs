@@ -4,12 +4,12 @@ using System.Security.Claims;
 
 namespace GimpiesBlazor.Authentication
 {
-    public class CustomAuthenticationStateProvider : AuthenticationStateProvider
+    public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ProtectedSessionStorage _sessionStorage;
         private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
 
-        public CustomAuthenticationStateProvider(ProtectedSessionStorage sessionStorage)
+        public CustomAuthStateProvider(ProtectedSessionStorage sessionStorage)
         {
             _sessionStorage = sessionStorage;
         }
@@ -24,12 +24,12 @@ namespace GimpiesBlazor.Authentication
                 if (userSession is null)
                     return await Task.FromResult(new AuthenticationState(_anonymous));
 
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-                {
+                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
+                [
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
                     new Claim(ClaimTypes.Role, userSession.Role)
-                }, "CustomAuth"));
+                ], "GimpiesAuth"));
 
                 return await Task.FromResult(new AuthenticationState(claimsPrincipal));
             }

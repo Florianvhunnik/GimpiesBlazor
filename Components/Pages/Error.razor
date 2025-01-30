@@ -34,7 +34,8 @@
 @code {
     [Parameter]
     public int ErrorCode { get; set; }
-    private string? _errorMessage;
+
+    private string _errorMessage { get; set; } = string.Empty;
 
     protected override void OnInitialized()
     {

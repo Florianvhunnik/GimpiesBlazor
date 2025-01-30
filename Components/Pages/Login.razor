@@ -91,18 +91,18 @@
 
             SessionManager.SetAccount(account);
 
-            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            var customAuthStateProvider = (CustomAuthStateProvider)authStateProvider;
 
-            await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession
+            await customAuthStateProvider.UpdateAuthenticationState(new UserSession
                 {
                     Username = account.Username,
                     Email = account.Email,
                     Role = account.Role.RoleName
                 });
 
-            NavigationManager.NavigateTo("/dashboard", true);
-
             Snackbar.Add("Succesvol ingelogd!", Severity.Success);
+
+            NavigationManager.NavigateTo("/dashboard", true);
         }
         catch (InvalidOperationException)
         {

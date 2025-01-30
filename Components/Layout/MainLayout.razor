@@ -32,11 +32,11 @@
 </MudLayout>
 
 
-@*@<div id="blazor-error-ui" data-nosnippet>
+<div id="blazor-error-ui" data-nosnippet>
     Er is een fout opgetreden.
     <a href="." class="reload">Herladen</a>
     <span class="dismiss">🗙</span>
-</div>*@
+</div>
 
 @code {
     private bool _drawerOpen = true;
@@ -45,7 +45,7 @@
 
     private async void Logout()
     {
-        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        var customAuthStateProvider = (CustomAuthStateProvider)authStateProvider;
         await customAuthStateProvider.UpdateAuthenticationState(null);
         NavigationManager.NavigateTo("/login", true);
     }
