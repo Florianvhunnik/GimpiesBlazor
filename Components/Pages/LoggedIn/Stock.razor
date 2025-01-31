@@ -1,0 +1,54 @@
+﻿@page "/stock"
+@inject ISnackbar Snackbar
+@inject StockManager StockManager
+
+@using GimpiesBlazor.Managers
+@using GimpiesBlazor.Models.Entities
+
+<AuthorizeView>
+    <Authorized>
+        <PageTitle>Voorraad</PageTitle>
+
+        <MudTable Items="stockList" Hover="true" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Primary">
+            <HeaderContent>
+                <MudTh>Merk</MudTh>
+                <MudTh>Type</MudTh>
+                <MudTh>Maat</MudTh>
+                <MudTh>Kleur</MudTh>
+                <MudTh>Aantal</MudTh>
+                <MudTh>Prijs</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="stock">
+                <MudTd>@stock.Brand.Name</MudTd>
+                <MudTd>@stock.ShoeType.Name</MudTd>
+                <MudTd>@stock.Size</MudTd>
+                <MudTd>@stock.Color.Name</MudTd>
+                <MudTd>@stock.Count</MudTd>
+                <MudTd>@stock.Price.ToString("C")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </Authorized>
+
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<GimpiesBlazor.Models.Entities.Stock> stockList = new();
+    private bool _loading => loadingStock || stockList.Count == 0;
+    private bool loadingStock = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStock();
+    }
+
+    private async Task LoadStock()
+    {
+        loadingStock = true;
+        await Task.Delay(500);
+        stockList = await StockManager.GetStock();
+        loadingStock = false;
+    }
+}
