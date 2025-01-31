@@ -1,0 +1,90 @@
+﻿@page "/manage_stock"
+@inject ISnackbar Snackbar
+@inject StockManager StockManager
+
+@using GimpiesBlazor.Managers
+@using GimpiesBlazor.Models.Entities
+
+<AuthorizeView>
+    <Authorized>
+        <PageTitle>Schoenen beheren</PageTitle>
+
+        <MudTable Items="stockList"  Hover="true" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Primary" CanCancelEdit="true" EditButtonPosition="TableEditButtonPosition.End"
+             EditTrigger="TableEditTrigger.EditButton" RowEditCommit="ChangesMade" MultiSelection="true">
+            <ToolBarContent>
+                <MudButton Size="@Size.Small" StartIcon="@Icons.Material.Outlined.Refresh" OnClick="LoadStock"></MudButton>
+                <MudText Typo="Typo.h6">Voorraad</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Merk</MudTh>
+                <MudTh>Type</MudTh>
+                <MudTh>Maat</MudTh>
+                <MudTh>Kleur</MudTh>
+                <MudTh>Aantal</MudTh>
+                <MudTh>Prijs</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="stock">
+                <MudTd>@stock.Brand.Name</MudTd>
+                <MudTd>@stock.ShoeType.Name</MudTd>
+                <MudTd>@stock.Size</MudTd>
+                <MudTd>@stock.Color.Name</MudTd>
+                <MudTd>@stock.Count</MudTd>
+                <MudTd>@stock.Price.ToString("C")</MudTd>
+            </RowTemplate>
+            <RowEditingTemplate Context="stock">
+                <MudTd> <MudTextField @bind-Value="stock.Brand.Name" Required /> </MudTd>
+                <MudTd> <MudTextField @bind-Value="stock.ShoeType.Name" Required /> </MudTd>
+                <MudTd> <MudTextField @bind-Value="stock.Size" Required /> </MudTd>
+                <MudTd> <MudTextField @bind-Value="stock.Color.Name" Required /> </MudTd>
+                <MudTd> <MudTextField @bind-Value="stock.Count" Required /> </MudTd>
+                <MudTd> <MudTextField @bind-Value="stock.Price" Required /> </MudTd>
+            </RowEditingTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+            <EditButtonContent Context="button">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="false" />
+            </EditButtonContent>
+        </MudTable>
+
+    </Authorized>
+
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<GimpiesBlazor.Models.Entities.Stock> stockList = new();
+    private bool _loading => loadingStock || stockList.Count == 0;
+    private bool loadingStock = false;
+    private string searchString = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStock();
+    }
+
+    private async Task LoadStock()
+    {
+        await LoadAnim();
+        stockList = await StockManager.GetStock();
+    }
+
+    private async Task LoadAnim(){
+        loadingStock = true;
+        await Task.Delay(500);
+        loadingStock = false;
+    }
+
+    private async void ChangesMade(object element)
+    {
+        if (element is GimpiesBlazor.Models.Entities.Stock updatedStock)
+        {
+            await StockManager.UpdateStock(updatedStock);
+            Snackbar.Add("Wijzigingen zijn opgeslagen!", Severity.Success);
+        }
+    }
+}
