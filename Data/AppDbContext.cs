@@ -12,10 +12,10 @@ namespace GimpiesBlazor.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Color> Colors { get; set; }
+        public DbSet<ShoeType> ShoeTypes { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
-        public DbSet<StockType> StockTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

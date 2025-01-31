@@ -41,7 +41,7 @@ builder.Services.AddScoped<SessionManager>();
 builder.Services.AddScoped<AccountManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
-
+builder.Services.AddScoped<StockManager>();
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {

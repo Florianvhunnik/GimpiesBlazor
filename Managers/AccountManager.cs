@@ -1,8 +1,6 @@
-﻿using GimpiesBlazor.Components.Pages;
-using GimpiesBlazor.Data;
+﻿using GimpiesBlazor.Data;
 using GimpiesBlazor.Handlers;
 using GimpiesBlazor.Models.Entities;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
