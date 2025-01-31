@@ -183,6 +183,24 @@ namespace GimpiesBlazor.Migrations
                     b.ToTable("Sales");
                 });
 
+            modelBuilder.Entity("GimpiesBlazor.Models.Entities.ShoeType", b =>
+                {
+                    b.Property<int>("ShoeTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShoeTypeId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("ShoeTypeId");
+
+                    b.ToTable("ShoeTypes");
+                });
+
             modelBuilder.Entity("GimpiesBlazor.Models.Entities.Stock", b =>
                 {
                     b.Property<int>("StockId")
@@ -200,9 +218,8 @@ namespace GimpiesBlazor.Migrations
                     b.Property<int>("FkColorId")
                         .HasColumnType("int");
 
-                    b.Property<string>("FkTypeId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("FkTypeId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -213,36 +230,15 @@ namespace GimpiesBlazor.Migrations
                     b.Property<int>("Size")
                         .HasColumnType("int");
 
-                    b.Property<int>("TypeId")
-                        .HasColumnType("int");
-
                     b.HasKey("StockId");
 
                     b.HasIndex("FkBrandId");
 
                     b.HasIndex("FkColorId");
 
-                    b.HasIndex("TypeId");
+                    b.HasIndex("FkTypeId");
 
                     b.ToTable("Stock");
-                });
-
-            modelBuilder.Entity("GimpiesBlazor.Models.Entities.StockType", b =>
-                {
-                    b.Property<int>("TypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("TypeId");
-
-                    b.ToTable("StockTypes");
                 });
 
             modelBuilder.Entity("GimpiesBlazor.Models.Entities.Account", b =>
@@ -308,9 +304,9 @@ namespace GimpiesBlazor.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GimpiesBlazor.Models.Entities.StockType", "Type")
+                    b.HasOne("GimpiesBlazor.Models.Entities.ShoeType", "ShoeType")
                         .WithMany()
-                        .HasForeignKey("TypeId")
+                        .HasForeignKey("FkTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -318,7 +314,7 @@ namespace GimpiesBlazor.Migrations
 
                     b.Navigation("Color");
 
-                    b.Navigation("Type");
+                    b.Navigation("ShoeType");
                 });
 
             modelBuilder.Entity("GimpiesBlazor.Models.Entities.Permission", b =>
