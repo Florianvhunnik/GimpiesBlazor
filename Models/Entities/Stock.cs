@@ -14,8 +14,8 @@ namespace GimpiesBlazor.Models.Entities
         [ForeignKey(nameof(Color))]
         public int FkColorId { get; set; }
 
-        [ForeignKey(nameof(StockType))]
-        public string FkTypeId { get; set; } = string.Empty;
+        [ForeignKey(nameof(ShoeType))]
+        public int FkTypeId { get; set; }
 
         public int Size { get; set; }
         public int Count { get; set; }
@@ -27,7 +27,7 @@ namespace GimpiesBlazor.Models.Entities
 
         public virtual required Color Color { get; set; }
         public virtual required Brand Brand { get; set; }
-        public virtual required StockType Type { get; set; }
+        public virtual required ShoeType ShoeType { get; set; }
 
     }
 }

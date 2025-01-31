@@ -2,10 +2,10 @@
 
 namespace GimpiesBlazor.Models.Entities
 {
-    public class StockType
+    public class ShoeType
     {
         [Key]
-        public int TypeId { get; set; }
+        public int ShoeTypeId { get; set; }
 
         [MaxLength(50)]
         public string Name { get; set; } = string.Empty;
