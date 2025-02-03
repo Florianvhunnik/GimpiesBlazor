@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using GimpiesBlazor.Models.Entities;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Claims;
 
@@ -28,7 +29,8 @@ namespace GimpiesBlazor.Authentication
                 [
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
-                    new Claim(ClaimTypes.Role, userSession.Role)
+                    new Claim(ClaimTypes.Role, userSession.Role),
+                    new Claim("ProfilePicture", userSession.ProfilePicture)
                 ], "GimpiesAuth"));
 
                 return await Task.FromResult(new AuthenticationState(claimsPrincipal));
@@ -51,7 +53,8 @@ namespace GimpiesBlazor.Authentication
                 {
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
-                    new Claim(ClaimTypes.Role, userSession.Role)
+                    new Claim(ClaimTypes.Role, userSession.Role),
+                    new Claim("ProfilePicture", userSession.ProfilePicture)
                 }));
             }
             else

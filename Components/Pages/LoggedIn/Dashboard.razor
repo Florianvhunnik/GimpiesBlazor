@@ -1,5 +1,6 @@
 ﻿@page "/"
 @page "/dashboard"
+@using GimpiesBlazor.Authentication
 @inject ISnackbar Snackbar
 
 <AuthorizeView>
@@ -9,6 +10,7 @@
         <MudGrid>
             <MudItem xs="12" sm="6" md="4" lg="3">
                 <MudCard>
+                    <img src="@_profilePicture" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%;" />
                     <MudCardHeader>
                         <MudText Typo="Typo.h6">Welkom @_username!</MudText>
                     </MudCardHeader>
@@ -30,13 +32,17 @@
     private Task<AuthenticationState> authStateTask { get; set; } = default!;
 
     private string? _username;
+    private string _profilePicture = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await authStateTask;
-        var identity = authState.User.Identity;
+        var user = authState.User;
 
-        if (identity is not null && identity.IsAuthenticated)
-            _username = identity.Name;
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            _username = user.Identity.Name;
+            _profilePicture = user.FindFirst("ProfilePicture")!.Value;
+        }
     }
 }
