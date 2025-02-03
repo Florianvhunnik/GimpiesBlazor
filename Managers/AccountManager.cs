@@ -45,7 +45,11 @@ namespace GimpiesBlazor.Managers
                     Email = email,
                     PasswordHash = HashPassword(password),
                     FkRoleId = existingRole.RoleId,
-                    Role = existingRole
+                    Role = existingRole,
+                    ProfilePicture = new ProfilePicture
+                    {
+                        Link = "https://postimg.cc/CzFkFCXv/af751f02"
+                    }
                 };
 
                 context.Accounts.Add(account);
@@ -64,6 +68,7 @@ namespace GimpiesBlazor.Managers
             try
             {
                 var account = await context.Accounts
+                    .Include(a => a.ProfilePicture)
                     .Include(a => a.Role)
                     .ThenInclude(r => r.RolePermissions)
                     .ThenInclude(rp => rp.Permission)
