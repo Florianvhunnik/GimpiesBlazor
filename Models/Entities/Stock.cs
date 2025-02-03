@@ -29,5 +29,26 @@ namespace GimpiesBlazor.Models.Entities
         public virtual required Brand Brand { get; set; }
         public virtual required ShoeType ShoeType { get; set; }
 
+
+        [NotMapped]
+        public int SelectedBrandId
+        {
+            get => Brand.BrandId;
+            set => Brand = new Brand { BrandId = value };
+        }
+
+        [NotMapped]
+        public int SelectedShoeTypeId
+        {
+            get => ShoeType.ShoeTypeId;
+            set => ShoeType = new ShoeType { ShoeTypeId = value };
+        }
+
+        [NotMapped]
+        public int SelectedColorId
+        {
+            get => Color.ColorId;
+            set => Color = new Color { ColorId = value };
+        }
     }
 }

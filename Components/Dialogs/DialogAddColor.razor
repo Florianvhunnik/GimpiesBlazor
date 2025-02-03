@@ -1,0 +1,35 @@
+﻿@using GimpiesBlazor.Managers
+@inject ISnackbar Snackbar
+@inject StockManager StockManager
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_colorName" Label="Kleur naam" Required />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddColor">Opslaan</MudButton>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">Annuleren</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private string _colorName = string.Empty;
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task AddColor()
+    {
+        if (string.IsNullOrWhiteSpace(_colorName))
+        {
+            Snackbar.Add("Kleurnaam is verplicht.", Severity.Error);
+            return;
+        }
+
+        await StockManager.AddColor(new GimpiesBlazor.Models.Entities.Color() { Name = _colorName });
+        Snackbar.Add("Kleur toegevoegd!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

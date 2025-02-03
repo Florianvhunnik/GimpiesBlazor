@@ -3,6 +3,7 @@
 @inject StockManager StockManager
 @inject IDialogService DialogService
 
+@using GimpiesBlazor.Components.Dialogs
 @using GimpiesBlazor.Managers
 @using GimpiesBlazor.Models.Entities
 
@@ -43,20 +44,50 @@
                 <MudTd>@stock.Price.ToString("C")</MudTd>
             </RowTemplate>
             <RowEditingTemplate Context="stock">
-                <MudTd> <MudTextField @bind-Value="stock.Brand.Name" Required /> </MudTd>
-                <MudTd> <MudTextField @bind-Value="stock.ShoeType.Name" Required /> </MudTd>
-                <MudTd> <MudTextField @bind-Value="stock.Size" Required /> </MudTd>
-                <MudTd> <MudTextField @bind-Value="stock.Color.Name" Required /> </MudTd>
+                <MudTd>
+                    <MudSelect T="int" @bind-Value="stock.SelectedBrandId" Required>
+                        @foreach (var brand in _brands)
+                        {
+                            <MudSelectItem Value="brand.BrandId">@brand.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudSelect T="int" @bind-Value="stock.SelectedShoeTypeId" Required>
+                        @foreach (var shoeType in _shoeTypes)
+                        {
+                            <MudSelectItem Value="shoeType.ShoeTypeId">@shoeType.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="stock.Size" Required />
+                </MudTd>
+                <MudTd>
+                    <MudSelect T="int" @bind-Value="stock.SelectedColorId" Required>
+                        @foreach (var color in _colors)
+                        {
+                            <MudSelectItem Value="color.ColorId">@color.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
                 <MudTd> <MudTextField @bind-Value="stock.Count" Required /> </MudTd>
                 <MudTd> <MudTextField @bind-Value="stock.Price" Required /> </MudTd>
             </RowEditingTemplate>
+
             <PagerContent>
                 <MudTablePager />
             </PagerContent>
+
             <EditButtonContent Context="button">
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="false" />
             </EditButtonContent>
         </MudTable>
+        
+        <MudButton Size="@Size.Small" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddBrandDialog">Merk toevoegen</MudButton>
+        <MudButton Size="@Size.Small" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddShoeTypeDialog">Type toevoegen</MudButton>
+        <MudButton Size="@Size.Small" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddColorDialog">Kleur toevoegen</MudButton>
+
 
     </Authorized>
 
@@ -70,9 +101,22 @@
     private bool _loadingStock = false;
     private HashSet<GimpiesBlazor.Models.Entities.Stock> _selectedStock = new();
 
+    private List<Brand> _brands = new();
+    private List<ShoeType> _shoeTypes = new();
+    private List<GimpiesBlazor.Models.Entities.Color> _colors = new();
+
+
     protected override async Task OnInitializedAsync()
     {
+        await LoadData();
         await LoadStock();
+    }
+
+    private async Task LoadData()
+    {
+        _brands = await StockManager.GetBrands();
+        _shoeTypes = await StockManager.GetShoeTypes();
+        _colors = await StockManager.GetColors();
     }
 
     private async Task LoadStock()
@@ -135,8 +179,49 @@
     {
         if (element is GimpiesBlazor.Models.Entities.Stock updatedStock)
         {
+            updatedStock.Brand = await StockManager.GetBrandById(updatedStock.SelectedBrandId);
+            updatedStock.ShoeType = await StockManager.GetShoeTypeById(updatedStock.SelectedShoeTypeId);
+            updatedStock.Color = await StockManager.GetColorById(updatedStock.SelectedColorId);
+
             await StockManager.UpdateStock(updatedStock);
             Snackbar.Add("Wijzigingen zijn opgeslagen!", Severity.Success);
+            await LoadStock();
+        }
+    }
+
+    private async Task AddBrandDialog()
+    {
+        var dialog = await DialogService.ShowAsync<DialogAddBrand>("Nieuw merk toevoegen");
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            Snackbar.Add("Merk succesvol toegevoegd!", Severity.Success);
+        }
+    }
+
+    private async Task AddShoeTypeDialog()
+    {
+        var dialog = await DialogService.ShowAsync<DialogAddShoeType>("Nieuw type toevoegen");
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            Snackbar.Add("Type succesvol toegevoegd!", Severity.Success);
+        }
+    }
+
+    private async Task AddColorDialog()
+    {
+        var dialog = await DialogService.ShowAsync<DialogAddColor>("Nieuwe kleur toevoegen");
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            Snackbar.Add("Kleur succesvol toegevoegd!", Severity.Success);
         }
     }
 }

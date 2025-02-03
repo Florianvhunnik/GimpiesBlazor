@@ -1,0 +1,109 @@
+﻿@page "/manage_staff"
+@using GimpiesBlazor.Components.Dialogs
+@using GimpiesBlazor.Managers
+@using GimpiesBlazor.Models.Entities
+@inject AccountManager AccountManager
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>Medewerkers beheren</PageTitle>
+
+<MudTable Items="_accountList"
+          Loading="@_loadingAccounts"
+          LoadingProgressColor="MudBlazor.Color.Primary"
+          CanCancelEdit="true"
+          EditTrigger="TableEditTrigger.EditButton"
+          EditButtonPosition="TableEditButtonPosition.End"
+          RowEditCommit="async (object account) => await UpdateAccount((Account)account)">
+    <ToolBarContent>
+        <MudButton Size="@Size.Large" Color="MudBlazor.Color.Success" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="OpenAddAccountDialog">Nieuw account</MudButton>
+        <MudButton Size="@Size.Large" Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" OnClick="DeleteSelectedAccounts">Verwijder geselecteerde</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Gebruikersnaam</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Status</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="account">
+        <MudTd>@account.Username</MudTd>
+        <MudTd>@account.Email</MudTd>
+        <MudTd>@(account.IsActive ? "Actief" : "Niet Actief")</MudTd>
+    </RowTemplate>
+    <RowEditingTemplate Context="account">
+        <MudTd><MudTextField @bind-Value="account.Username" Required /></MudTd>
+        <MudTd><MudTextField @bind-Value="account.Email" Required /></MudTd>
+        <MudTd>
+            <MudSelect @bind-Value="account.IsActive">
+                <MudSelectItem Value="true">Actief</MudSelectItem>
+                <MudSelectItem Value="false">Niet Actief</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+    </RowEditingTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authStateTask { get; set; } = default!;
+
+    private List<Account> _accountList = new();
+    private bool _loadingAccounts = false;
+
+    private int _currentUserAccountId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authStateTask;
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            _currentUserAccountId = int.Parse(user.FindFirst("sub")?.Value ?? "0");
+        }
+
+        await LoadAccounts();
+    }
+
+    private async Task LoadAccounts()
+    {
+        _loadingAccounts = true;
+        _accountList = await AccountManager.GetAllAccountsExcept(_currentUserAccountId);
+        _loadingAccounts = false;
+    }
+
+    private async Task UpdateAccount(Account account)
+    {
+        if (!await AccountManager.UpdateAccount(account))
+        {
+            Snackbar.Add("Fout bij het bijwerken van account!", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add("Account succesvol bijgewerkt!", Severity.Success);
+    }
+
+    private async Task OpenAddAccountDialog()
+    {
+        var dialog = await DialogService.ShowAsync<DialogAddAccount>("Nieuw account toevoegen");
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadAccounts();
+            Snackbar.Add("Account succesvol toegevoegd!", Severity.Success);
+        }
+    }
+
+    private async Task DeleteSelectedAccounts()
+    {
+        foreach (var account in _accountList.Where(a => a.IsActive))
+        {
+            await AccountManager.SoftDeleteAccount(account.AccountId);
+        }
+
+        await LoadAccounts();
+        Snackbar.Add("Geselecteerde accounts verwijderd!", Severity.Success);
+    }
+}

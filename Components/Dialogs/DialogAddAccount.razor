@@ -1,0 +1,47 @@
+﻿@using GimpiesBlazor.Managers
+@inject ISnackbar Snackbar
+@inject AccountManager AccountManager
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_username" Label="Gebruikersnaam" Required />
+        <MudTextField @bind-Value="_email" Label="Email" Required />
+        <MudTextField @bind-Value="_password" Label="Wachtwoord" InputType="InputType.Password" Required />
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddAccount">Opslaan</MudButton>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">Annuleren</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private string _username = string.Empty;
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+
+    private async Task AddAccount()
+    {
+        if (string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_email) || string.IsNullOrWhiteSpace(_password))
+        {
+            Snackbar.Add("Alle velden zijn verplicht!", Severity.Error);
+            return;
+        }
+
+        var success = await AccountManager.RegisterUserAsync(_username, _email, _password, "Staff");
+        if (!success)
+        {
+            Snackbar.Add("Fout bij het aanmaken van het account!", Severity.Error);
+        }
+        else
+        {
+            Snackbar.Add("Nieuw account succesvol aangemaakt!", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+}

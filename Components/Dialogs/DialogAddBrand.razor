@@ -1,0 +1,37 @@
+﻿@using GimpiesBlazor.Managers
+@using GimpiesBlazor.Models.Entities
+@using Color = MudBlazor.Color
+@inject ISnackbar Snackbar
+@inject StockManager StockManager
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_brandName" Label="Merknaam" Required />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddBrand">Opslaan</MudButton>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">Annuleren</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private string _brandName = string.Empty;
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task AddBrand()
+    {
+        if (string.IsNullOrWhiteSpace(_brandName))
+        {
+            Snackbar.Add("Merknaam is verplicht.", Severity.Error);
+            return;
+        }
+
+        await StockManager.AddBrand(new Brand { Name = _brandName });
+        Snackbar.Add("Merk toegevoegd!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

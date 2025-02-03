@@ -101,9 +101,35 @@ namespace GimpiesBlazor.Managers
             }
         }
 
-        public void LogoutUser()
+        public async Task<List<Account>> GetAllAccountsExcept(int currentAccountId)
         {
-            
+            return await context.Accounts
+                .Where(a => a.AccountId != currentAccountId)
+                .Include(a => a.Role)
+                .Include(a => a.ProfilePicture)
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdateAccount(Account account)
+        {
+            try
+            {
+                context.Accounts.Update(account);
+                return await context.SaveChangesAsync() > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> SoftDeleteAccount(int accountId)
+        {
+            var account = await context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
+            if (account == null) return false;
+
+            account.IsActive = false;
+            return await context.SaveChangesAsync() > 0;
         }
     }
 }

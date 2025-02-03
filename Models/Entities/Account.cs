@@ -23,9 +23,6 @@ namespace GimpiesBlazor.Models.Entities
         [ForeignKey(nameof(ProfilePicture))] public int FkProfilePictureId { get; set; }
 
         public virtual required Role Role { get; set; }
-        public virtual required ProfilePicture ProfilePicture { get; set; } = new()
-        {
-            Link = "https://postimg.cc/CzFkFCXv/af751f02"
-        };
+        public virtual required ProfilePicture ProfilePicture { get; set; }
     }
 }
