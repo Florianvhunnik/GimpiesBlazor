@@ -10,14 +10,19 @@
         <MudGrid>
             <MudItem xs="12" sm="6" md="4" lg="3">
                 <MudCard>
-                    <img src="@_profilePicture" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%;" />
-                    <MudCardHeader>
-                        <MudText Typo="Typo.h6">Welkom @_username!</MudText>
-                    </MudCardHeader>
-                    <MudCardContent>
-                        <MudText Typo="Typo.body1">Dit is het dashboard voor medewerkers van schoenenbedrijf Gimpies!</MudText>
-                    </MudCardContent>
+                    <div style="display: flex; align-items: center; padding: 16px;">
+                        <img src="@_profilePicture" alt="Profile Picture" style="width: 80px; height: 80px; border-radius: 50%; margin-right: 16px;" />
+                        <div>
+                            <MudCardHeader>
+                                <MudText Typo="Typo.h6">Welkom @_username!</MudText>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudText Typo="Typo.body1">Dit is het dashboard voor medewerkers van schoenenbedrijf Gimpies!</MudText>
+                            </MudCardContent>
+                        </div>
+                    </div>
                 </MudCard>
+
             </MudItem>
         </MudGrid>
     </Authorized>
@@ -42,7 +47,7 @@
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {
             _username = user.Identity.Name;
-            _profilePicture = user.FindFirst("ProfilePicture")!.Value;
+            _profilePicture = user.FindFirst("ProfilePicture")!.Value + ".png";
         }
     }
 }
