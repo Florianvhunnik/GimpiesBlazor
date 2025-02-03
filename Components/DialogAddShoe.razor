@@ -1,0 +1,45 @@
+﻿@using GimpiesBlazor.Managers
+@using GimpiesBlazor.Models.Entities
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField Validation="@(new Func<string, IEnumerable<string>>((input) => ValidationManager.ValidAddShoeString(input)))"
+            T="string" @bind-Value="Stock.Brand.Name" Label="Merk" />
+        <MudTextField Validation="@(new Func<string, IEnumerable<string>>((input) => ValidationManager.ValidAddShoeString(input)))"
+                      T="string" @bind-Value="Stock.Color.Name" Label="Kleur" />
+        <MudTextField Validation="@(new Func<string, IEnumerable<string>>((input) => ValidationManager.ValidAddShoeString(input)))"
+                      T="string" @bind-Value="Stock.ShoeType.Name" Label="Type" />
+        <MudTextField Validation="@(new Func<int, IEnumerable<string>>((input) => ValidationManager.ValidShoeSize(input)))"
+                      T="int" @bind-Value="Stock.Size" Label="Grootte" />
+        <MudTextField Validation="@(new Func<int, IEnumerable<string>>((input) => ValidationManager.ValidCount(input)))"
+                      T="int" @bind-Value="Stock.Count" Label="Aantal" />
+        <MudTextField Validation="@(new Func<decimal, IEnumerable<string>>((input) => ValidationManager.ValidCount(input)))"
+                      T="decimal" @bind-Value="Stock.Price" Label="Prijs" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Annuleren</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="AddShoe">Toevoegen</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    public Stock Stock { get; set; } = new Stock() 
+    {
+        Brand = new Brand(), 
+        Color = new Models.Entities.Color(), 
+        ShoeType = new ShoeType(),
+        IsActive = true
+    };
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void AddShoe()
+    {
+        if (Stock != null)
+            MudDialog.Close(DialogResult.Ok(Stock));
+    }
+}

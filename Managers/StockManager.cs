@@ -18,6 +18,32 @@ namespace GimpiesBlazor.Managers
 
         public async Task AddStock(Stock stock)
         {
+            var existingBrand = await context.Brands
+                .FirstOrDefaultAsync(b => b.Name == stock.Brand.Name);
+
+            if (existingBrand != null)
+                stock.Brand = existingBrand;
+            else
+                context.Brands.Add(stock.Brand);
+
+            var existingColor = await context.Colors
+                .FirstOrDefaultAsync(c => c.Name == stock.Color.Name);
+
+            if (existingColor != null)
+                stock.Color = existingColor;
+            else
+                context.Colors.Add(stock.Color);
+
+            var existingShoeType = await context.ShoeTypes
+                .FirstOrDefaultAsync(t => t.Name == stock.ShoeType.Name);
+
+            if (existingShoeType != null)
+                stock.ShoeType = existingShoeType;
+            else
+                context.ShoeTypes.Add(stock.ShoeType);
+
+            stock.IsActive = true;
+
             context.Stock.Add(stock);
             await context.SaveChangesAsync();
         }

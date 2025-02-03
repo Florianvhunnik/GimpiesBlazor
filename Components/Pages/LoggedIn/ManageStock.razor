@@ -1,6 +1,7 @@
 ﻿@page "/manage_stock"
 @inject ISnackbar Snackbar
 @inject StockManager StockManager
+@inject IDialogService DialogService
 
 @using GimpiesBlazor.Managers
 @using GimpiesBlazor.Models.Entities
@@ -9,13 +10,21 @@
     <Authorized>
         <PageTitle>Schoenen beheren</PageTitle>
 
-        <MudTable Items="_stockList" Hover="true" Loading="@_loadingStock" LoadingProgressColor="MudBlazor.Color.Primary" CanCancelEdit="true" EditButtonPosition="TableEditButtonPosition.End"
-                  EditTrigger="TableEditTrigger.EditButton" RowEditCommit="async (changes) => await ChangesMade(changes)" MultiSelection="true">
+        <MudTable Items="_stockList"
+                  Hover="true"
+                  Loading="@_loadingStock"
+                  LoadingProgressColor="MudBlazor.Color.Primary"
+                  CanCancelEdit="true"
+                  EditTrigger="TableEditTrigger.EditButton"
+                  EditButtonPosition="TableEditButtonPosition.End"
+                  RowEditCommit="async (changes) => await ChangesMade(changes)"
+                  MultiSelection="true"
+                  @bind-SelectedItems="_selectedStock">
             <ToolBarContent>
-                <MudButton Size="@Size.Small" StartIcon="@Icons.Material.Outlined.Refresh" OnClick="LoadStock"></MudButton>
+                <MudButton Size="@Size.Large" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadStock"></MudButton>
+                <MudButton Size="@Size.Large" Color="MudBlazor.Color.Success" StartIcon="@Icons.Material.Filled.AddBox" OnClick="AddShoe"></MudButton>
+                <MudButton Size="@Size.Large" Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" OnClick="DeleteShoe"></MudButton>
                 <MudText Typo="Typo.h6">Voorraad</MudText>
-                <MudSpacer />
-                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Merk</MudTh>
@@ -59,7 +68,7 @@
 @code {
     private List<GimpiesBlazor.Models.Entities.Stock> _stockList = new();
     private bool _loadingStock = false;
-    private string _searchString = String.Empty;
+    private HashSet<GimpiesBlazor.Models.Entities.Stock> _selectedStock = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,6 +81,24 @@
         _stockList = await StockManager.GetStock();
     }
 
+    private async Task AddShoe()
+    {
+        var dialog = await DialogService.ShowAsync<DialogAddShoe>("Nieuwe Schoen Toevoegen");
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            var newShoe = result.Data as GimpiesBlazor.Models.Entities.Stock;
+
+            if (newShoe != null)
+            {
+                await StockManager.AddStock(newShoe);
+                Snackbar.Add("Schoen toegevoegd", Severity.Success);
+
+                await LoadStock();
+            }
+        }
+    }
     private async Task LoadAnim(){
         _loadingStock = true;
         await Task.Delay(500);

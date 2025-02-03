@@ -50,5 +50,39 @@ namespace GimpiesBlazor.Managers
             if (password != passwordRepeat)
                 yield return "Wachtwoorden komen niet overeen";
         }
+
+        public static IEnumerable<string> ValidAddShoeString(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                yield return "Vul een waarde in";
+            if (input.Length < 3)
+                yield return "Waarde moet minimaal 3 tekens bevatten";
+            if (input.Length > 25)
+                yield return "Waarde mag maximaal 25 tekens bevatten";
+        }
+
+        public static IEnumerable<string> ValidShoeSize(int input) 
+        { 
+            if (input.Equals(null))
+                yield return "Vul een waarde in";
+            if (input < 10 || input > 60)
+                yield return "Geef een geldige schoenmaat"; 
+        }
+
+        public static IEnumerable<string> ValidCount(int input)
+        {
+            if (input.Equals(null))
+                yield return "Vul een waarde in";
+            if (input < 1)
+                yield return "Vul een geldige hoeveelheid in";
+        }
+
+        public static IEnumerable<string> ValidCount(decimal input)
+        {
+            if (input.Equals(null))
+                yield return "Vul een waarde in";
+            if (input < 1)
+                yield return "Vul een geldige hoeveelheid in";
+        }
     }
 }
