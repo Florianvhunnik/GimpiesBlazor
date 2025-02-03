@@ -67,7 +67,10 @@ namespace GimpiesBlazor.Managers
                     .Include(a => a.Role)
                     .ThenInclude(r => r.RolePermissions)
                     .ThenInclude(rp => rp.Permission)
-                    .FirstOrDefaultAsync(a => a.Username == usernameOrEmail || a.Email == usernameOrEmail);
+                    .FirstOrDefaultAsync(a => 
+                        EF.Functions.Collate(a.Username, "SQL_Latin1_General_CP1_CS_AS") == usernameOrEmail ||
+                        EF.Functions.Collate(a.Email, "SQL_Latin1_General_CP1_CS_AS") == usernameOrEmail);
+
 
                 if (account != null && VerifyPassword(account.PasswordHash, password))
                     return account.IsActive ? (account, true) : (account, false);
