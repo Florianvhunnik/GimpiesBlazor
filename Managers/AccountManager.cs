@@ -59,7 +59,7 @@ namespace GimpiesBlazor.Managers
             }
         }
 
-        public async Task<Account?> CheckAccountAsync(string usernameOrEmail, string password)
+        public async Task<(Account? account, bool isActive)> CheckAccountAsync(string usernameOrEmail, string password)
         {
             try
             {
@@ -70,11 +70,9 @@ namespace GimpiesBlazor.Managers
                     .FirstOrDefaultAsync(a => a.Username == usernameOrEmail || a.Email == usernameOrEmail);
 
                 if (account != null && VerifyPassword(account.PasswordHash, password))
-                {
-                    return account;
-                }
+                    return account.IsActive ? (account, true) : (account, false);
 
-                return null;
+                return (null, true);
             }
             catch (Exception)
             {

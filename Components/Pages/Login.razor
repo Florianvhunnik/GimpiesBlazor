@@ -78,7 +78,13 @@
 
         try
         {
-            var account = await AccountManager.CheckAccountAsync(input, model.Password);
+            var (account, isActive) = await AccountManager.CheckAccountAsync(input, model.Password);
+
+            if (!isActive)
+            {
+                Snackbar.Add("Dit account is niet actief!", Severity.Warning);
+                return;
+            }
 
             if (account is null)
             {
