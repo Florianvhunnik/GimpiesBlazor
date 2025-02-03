@@ -10,14 +10,14 @@
 <MudPaper Class="pa-10 mx-auto" MaxWidth="400px">
     <MudText Typo="Typo.h5" Align="Align.Center">Gimpies Registreren</MudText>
     <MudForm @ref="_form" Model="model">
-        <MudTextField @bind-Value="model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
+        <MudTextField Class="mb-1" T="string" @bind-Value="model.Username" Label="Gebruikersnaam"
                       Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, false)))" />
-        <MudTextField @bind-Value="model.Email" Label="E-Mail" InputType="InputType.Email" Required="true" RequiredError="Vul uw e-mailadres in"
+        <MudTextField Class="mb-1" T="string" @bind-Value="model.Email" Label="E-Mail" InputType="InputType.Email"
             Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
-        <MudTextField @bind-Value="model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
-            Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, false)))" />
-        <MudTextField @bind-Value="model.PasswordRepeat" Label="Bevestig Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Bevestig uw wachtwoord"
-                      Validation="@(new Func<string, IEnumerable<string>>(value => ValidationManager.MatchPassword(model.Password, value)))" />
+        <MudTextField Class="mb-1" T="string" @bind-Value="model.Password" Label="Wachtwoord" Required="true" RequiredError="Vul uw wachtwoord in"
+                      Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, false)))" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" InputType="@PasswordInput" OnAdornmentClick="TogglePasswordView" />
+        <MudTextField Class="mb-1" T="string" @bind-Value="model.PasswordRepeat" Label="Bevestig Wachtwoord"
+                      Validation="@(new Func<string, IEnumerable<string>>(value => ValidationManager.MatchPassword(model.Password, value)))" Adornment="Adornment.End" InputType="@PasswordInput" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordView" />
 
         <MudButton OnClick="@(async () => await RegisterUser())" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Registreren</MudButton>
     </MudForm>
@@ -118,4 +118,25 @@
             await _form!.ResetAsync();
         }
     }
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void TogglePasswordView()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
 }

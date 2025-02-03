@@ -17,16 +17,16 @@
         <MudTabs @bind-ActivePanelIndex="ActiveTab" Class="mt-4" Centered="true">
             <MudTabPanel Text="Gebruikersnaam">
                 <MudTextField @bind-Value="model.Username" Label="Gebruikersnaam" Required="true" RequiredError="Vul uw gebruikersnaam in"
-                    Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, true)))" />
+                    Class="mb-1" Validation="@(new Func<string, IEnumerable<string>>((username) => ValidationManager.ValidUsername(username, true)))" />
             </MudTabPanel>
             <MudTabPanel Text="E-mail">
                 <MudTextField @bind-Value="model.Email" Label="E-Mail" Required="true" RequiredError="Vul uw E-Mail in" InputType="InputType.Email"
-                    Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" />
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidationManager.ValidEmail))" Class="mb-1" />
             </MudTabPanel>
         </MudTabs>
 
-        <MudTextField @bind-Value="model.Password" Label="Wachtwoord" InputType="InputType.Password" Required="true" RequiredError="Vul uw wachtwoord in"
-            Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, true)))" />
+        <MudTextField @bind-Value="model.Password" Label="Wachtwoord" Required="true" RequiredError="Vul uw wachtwoord in"
+                      Class="mb-1" Validation="@(new Func<string, IEnumerable<string>>((password) => ValidationManager.ValidPassword(password, true)))" Adornment="Adornment.End" InputType="@PasswordInput" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordView" />
 
         <MudButton OnClick="@(async () => await Authenticate())" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true">Inloggen</MudButton>
     </MudForm>
@@ -139,6 +139,26 @@
         finally
         {
             await _form!.ResetAsync();
+        }
+    }
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void TogglePasswordView()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
         }
     }
 }
