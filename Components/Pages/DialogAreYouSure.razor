@@ -1,0 +1,24 @@
+﻿@using GimpiesBlazor.Models.Entities
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText>Weet je het zeker dat je deze schoen(en) wilt verwijderen?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Annuleren</MudButton>
+        <MudButton Color="MudBlazor.Color.Error" Variant="Variant.Filled" OnClick="DeleteShoe">Verwijderen</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void DeleteShoe()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

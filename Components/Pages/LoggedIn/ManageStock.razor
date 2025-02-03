@@ -99,6 +99,32 @@
             }
         }
     }
+
+    private async Task DeleteShoe()
+    {
+        if (!_selectedStock.Any())
+        {
+            Snackbar.Add("Geen schoenen geselecteerd om te verwijderen.", Severity.Warning);
+            return;
+        }
+
+        var dialog = await DialogService.ShowAsync<DialogAreYouSure>("Weet je het zeker?");
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            foreach (var shoe in _selectedStock)
+            {
+                await StockManager.DeleteStock(shoe.StockId);
+            }
+
+            Snackbar.Add($"{_selectedStock.Count} schoen(en) verwijderd.", Severity.Success);
+
+            await LoadStock();
+            _selectedStock.Clear();
+        }
+    }
+
     private async Task LoadAnim(){
         _loadingStock = true;
         await Task.Delay(500);

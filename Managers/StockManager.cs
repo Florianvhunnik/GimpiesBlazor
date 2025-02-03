@@ -48,11 +48,34 @@ namespace GimpiesBlazor.Managers
             await context.SaveChangesAsync();
         }
 
+
         public async Task UpdateStock(Stock stock)
         {
+            var existingBrand = await context.Brands.FirstOrDefaultAsync(b => b.Name == stock.Brand.Name);
+
+            if (existingBrand != null)
+                stock.Brand = existingBrand;
+            else
+                context.Brands.Add(stock.Brand);
+
+            var existingColor = await context.Colors.FirstOrDefaultAsync(c => c.Name == stock.Color.Name);
+
+            if (existingColor != null)
+                stock.Color = existingColor;
+            else
+                context.Colors.Add(stock.Color);
+
+            var existingShoeType = await context.ShoeTypes.FirstOrDefaultAsync(t => t.Name == stock.ShoeType.Name);
+
+            if (existingShoeType != null)
+                stock.ShoeType = existingShoeType;
+            else
+                context.ShoeTypes.Add(stock.ShoeType);
+
             context.Stock.Update(stock);
             await context.SaveChangesAsync();
         }
+
 
         public async Task DeleteStock(int stockId)
         {
@@ -66,6 +89,5 @@ namespace GimpiesBlazor.Managers
             stock.IsActive = false;
             await context.SaveChangesAsync();
         }
-
     }
 }
