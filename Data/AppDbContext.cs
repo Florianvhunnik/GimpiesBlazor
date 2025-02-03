@@ -27,6 +27,11 @@ namespace GimpiesBlazor.Data
             // Unique
             modelBuilder.Entity<Account>().HasIndex(a => a.Username).IsUnique();
             modelBuilder.Entity<Account>().HasIndex(a => a.Email).IsUnique();
+            modelBuilder.Entity<Brand>().HasIndex(b => b.Name).IsUnique();
+            modelBuilder.Entity<Color>().HasIndex(c => c.Name).IsUnique();
+            modelBuilder.Entity<Permission>().HasIndex(p => p.Name).IsUnique();
+            modelBuilder.Entity<Role>().HasIndex(r => r.RoleName).IsUnique();
+            modelBuilder.Entity<ProfilePicture>().HasIndex(pp => pp.Link).IsUnique();
 
             // Max lengths
             //modelBuilder.Entity<Account>().Property(a => a.Username).HasMaxLength(50);
