@@ -49,3 +49,4 @@ appsettings.json
 # Migrations 
 Migrations/
 /Migrations
+Migrations/AppDbContextModelSnapshot.cs

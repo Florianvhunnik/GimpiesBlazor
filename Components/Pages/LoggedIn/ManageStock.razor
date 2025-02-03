@@ -9,7 +9,7 @@
     <Authorized>
         <PageTitle>Schoenen beheren</PageTitle>
 
-        <MudTable Items="_stockList" Hover="true" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Primary" CanCancelEdit="true" EditButtonPosition="TableEditButtonPosition.End"
+        <MudTable Items="_stockList" Hover="true" Loading="@_loadingStock" LoadingProgressColor="MudBlazor.Color.Primary" CanCancelEdit="true" EditButtonPosition="TableEditButtonPosition.End"
                   EditTrigger="TableEditTrigger.EditButton" RowEditCommit="async (changes) => await ChangesMade(changes)" MultiSelection="true">
             <ToolBarContent>
                 <MudButton Size="@Size.Small" StartIcon="@Icons.Material.Outlined.Refresh" OnClick="LoadStock"></MudButton>
@@ -58,7 +58,6 @@
 
 @code {
     private List<GimpiesBlazor.Models.Entities.Stock> _stockList = new();
-    private bool _loading => _loadingStock || _stockList.Count == 0;
     private bool _loadingStock = false;
     private string _searchString = String.Empty;
 

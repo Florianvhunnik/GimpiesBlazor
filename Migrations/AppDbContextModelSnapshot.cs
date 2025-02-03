@@ -35,6 +35,9 @@ namespace GimpiesBlazor.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("FkProfilePictureId")
+                        .HasColumnType("int");
+
                     b.Property<int>("FkRoleId")
                         .HasColumnType("int");
 
@@ -55,6 +58,8 @@ namespace GimpiesBlazor.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("FkProfilePictureId");
 
                     b.HasIndex("FkRoleId");
 
@@ -79,6 +84,9 @@ namespace GimpiesBlazor.Migrations
 
                     b.HasKey("BrandId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Brands");
                 });
 
@@ -96,6 +104,9 @@ namespace GimpiesBlazor.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("ColorId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Colors");
                 });
@@ -115,7 +126,31 @@ namespace GimpiesBlazor.Migrations
 
                     b.HasKey("PermissionId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Permissions");
+                });
+
+            modelBuilder.Entity("GimpiesBlazor.Models.Entities.ProfilePicture", b =>
+                {
+                    b.Property<int>("ProfilePictureId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfilePictureId"));
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("ProfilePictureId");
+
+                    b.HasIndex("Link")
+                        .IsUnique();
+
+                    b.ToTable("ProfilePictures");
                 });
 
             modelBuilder.Entity("GimpiesBlazor.Models.Entities.Role", b =>
@@ -132,6 +167,9 @@ namespace GimpiesBlazor.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("RoleId");
+
+                    b.HasIndex("RoleName")
+                        .IsUnique();
 
                     b.ToTable("Roles");
                 });
@@ -243,11 +281,19 @@ namespace GimpiesBlazor.Migrations
 
             modelBuilder.Entity("GimpiesBlazor.Models.Entities.Account", b =>
                 {
+                    b.HasOne("GimpiesBlazor.Models.Entities.ProfilePicture", "ProfilePicture")
+                        .WithMany()
+                        .HasForeignKey("FkProfilePictureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GimpiesBlazor.Models.Entities.Role", "Role")
                         .WithMany()
                         .HasForeignKey("FkRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ProfilePicture");
 
                     b.Navigation("Role");
                 });

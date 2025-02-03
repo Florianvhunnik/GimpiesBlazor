@@ -9,7 +9,7 @@
     <Authorized>
         <PageTitle>Voorraad</PageTitle>
 
-        <MudTable Items="stockList" Hover="true" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Primary">
+        <MudTable Items="_stockList" Hover="true" Loading="@_loadingStock" LoadingProgressColor="MudBlazor.Color.Primary">
             <HeaderContent>
                 <MudTh>Merk</MudTh>
                 <MudTh>Type</MudTh>
@@ -35,20 +35,19 @@
 </AuthorizeView>
 
 @code {
-    private List<GimpiesBlazor.Models.Entities.Stock> stockList = new();
-    private bool _loading => loadingStock || stockList.Count == 0;
-    private bool loadingStock = false;
+    private List<GimpiesBlazor.Models.Entities.Stock> _stockList = [];
+    private bool _loadingStock = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadStock();
+        await LoadAnim();
+        _stockList = await StockManager.GetStock();
     }
 
-    private async Task LoadStock()
+    private async Task LoadAnim()
     {
-        loadingStock = true;
+        _loadingStock = true;
         await Task.Delay(500);
-        stockList = await StockManager.GetStock();
-        loadingStock = false;
+        _loadingStock = false;
     }
 }
