@@ -71,7 +71,6 @@ namespace GimpiesBlazor.Managers
                         EF.Functions.Collate(a.Username, "SQL_Latin1_General_CP1_CS_AS") == usernameOrEmail ||
                         EF.Functions.Collate(a.Email, "SQL_Latin1_General_CP1_CS_AS") == usernameOrEmail);
 
-
                 if (account != null && VerifyPassword(account.PasswordHash, password))
                     return account.IsActive ? (account, true) : (account, false);
 

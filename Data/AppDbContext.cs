@@ -24,6 +24,9 @@ namespace GimpiesBlazor.Data
             modelBuilder.Entity<RolePermission>()
                 .HasKey(rp => new { rp.FkRoleId, rp.FkPermissionId });
 
+            // Unique
+            modelBuilder.Entity<Account>().HasIndex(a => a.Username).IsUnique();
+            modelBuilder.Entity<Account>().HasIndex(a => a.Email).IsUnique();
 
             // Max lengths
             //modelBuilder.Entity<Account>().Property(a => a.Username).HasMaxLength(50);
@@ -57,10 +60,6 @@ namespace GimpiesBlazor.Data
             // Precision for decimal
             //modelBuilder.Entity<Stock>().Property(s => s.Price).HasPrecision(18, 2);
             //modelBuilder.Entity<Sale>().Property(s => s.TotalSalePrice).HasPrecision(18, 2);
-
-            // Unique
-            modelBuilder.Entity<Account>().HasIndex(a => a.Username).IsUnique();
-            modelBuilder.Entity<Account>().HasIndex(a => a.Email).IsUnique();
         }
     }
 }
