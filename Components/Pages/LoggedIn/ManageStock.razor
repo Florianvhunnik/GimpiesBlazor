@@ -9,13 +9,13 @@
     <Authorized>
         <PageTitle>Schoenen beheren</PageTitle>
 
-        <MudTable Items="stockList"  Hover="true" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Primary" CanCancelEdit="true" EditButtonPosition="TableEditButtonPosition.End"
-             EditTrigger="TableEditTrigger.EditButton" RowEditCommit="ChangesMade" MultiSelection="true">
+        <MudTable Items="_stockList" Hover="true" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Primary" CanCancelEdit="true" EditButtonPosition="TableEditButtonPosition.End"
+                  EditTrigger="TableEditTrigger.EditButton" RowEditCommit="async (changes) => await ChangesMade(changes)" MultiSelection="true">
             <ToolBarContent>
                 <MudButton Size="@Size.Small" StartIcon="@Icons.Material.Outlined.Refresh" OnClick="LoadStock"></MudButton>
                 <MudText Typo="Typo.h6">Voorraad</MudText>
                 <MudSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Merk</MudTh>
@@ -57,10 +57,10 @@
 </AuthorizeView>
 
 @code {
-    private List<GimpiesBlazor.Models.Entities.Stock> stockList = new();
-    private bool _loading => loadingStock || stockList.Count == 0;
-    private bool loadingStock = false;
-    private string searchString = String.Empty;
+    private List<GimpiesBlazor.Models.Entities.Stock> _stockList = new();
+    private bool _loading => _loadingStock || _stockList.Count == 0;
+    private bool _loadingStock = false;
+    private string _searchString = String.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,16 +70,16 @@
     private async Task LoadStock()
     {
         await LoadAnim();
-        stockList = await StockManager.GetStock();
+        _stockList = await StockManager.GetStock();
     }
 
     private async Task LoadAnim(){
-        loadingStock = true;
+        _loadingStock = true;
         await Task.Delay(500);
-        loadingStock = false;
+        _loadingStock = false;
     }
 
-    private async void ChangesMade(object element)
+    private async Task ChangesMade(object element)
     {
         if (element is GimpiesBlazor.Models.Entities.Stock updatedStock)
         {
