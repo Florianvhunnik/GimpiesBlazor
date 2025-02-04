@@ -10,6 +10,10 @@
         <PageTitle>Voorraad</PageTitle>
 
         <MudTable Items="_stockList" Hover="true" Loading="@_loadingStock" LoadingProgressColor="MudBlazor.Color.Primary">
+            <ToolBarContent>
+                <MudButton Size="@Size.Large" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadStock"></MudButton>
+                <MudText Typo="Typo.h6">Voorraad</MudText>
+            </ToolBarContent>
             <HeaderContent>
                 <MudTh>Merk</MudTh>
                 <MudTh>Type</MudTh>
@@ -26,6 +30,10 @@
                 <MudTd>@stock.Count</MudTd>
                 <MudTd>@stock.Price.ToString("C")</MudTd>
             </RowTemplate>
+
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
         </MudTable>
     </Authorized>
 
@@ -40,8 +48,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadAnim();
-        _stockList = await StockManager.GetStock();
+        await LoadStock();
     }
 
     private async Task LoadAnim()
@@ -49,5 +56,11 @@
         _loadingStock = true;
         await Task.Delay(500);
         _loadingStock = false;
+    }
+
+    private async Task LoadStock()
+    {
+        await LoadAnim();
+        _stockList = await StockManager.GetStock();
     }
 }

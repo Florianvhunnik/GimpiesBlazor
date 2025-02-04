@@ -108,6 +108,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadAnim();
         await LoadData();
         await LoadStock();
     }
@@ -121,7 +122,6 @@
 
     private async Task LoadStock()
     {
-        await LoadAnim();
         _stockList = await StockManager.GetStock();
     }
 
@@ -194,7 +194,7 @@
         var dialog = await DialogService.ShowAsync<DialogAddBrand>("Nieuw merk toevoegen");
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled)
         {
             await LoadData();
             Snackbar.Add("Merk succesvol toegevoegd!", Severity.Success);
@@ -206,7 +206,7 @@
         var dialog = await DialogService.ShowAsync<DialogAddShoeType>("Nieuw type toevoegen");
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled)
         {
             await LoadData();
             Snackbar.Add("Type succesvol toegevoegd!", Severity.Success);
@@ -218,7 +218,7 @@
         var dialog = await DialogService.ShowAsync<DialogAddColor>("Nieuwe kleur toevoegen");
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled)
         {
             await LoadData();
             Snackbar.Add("Kleur succesvol toegevoegd!", Severity.Success);

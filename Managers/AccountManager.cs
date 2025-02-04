@@ -46,10 +46,7 @@ namespace GimpiesBlazor.Managers
                     PasswordHash = HashPassword(password),
                     FkRoleId = existingRole.RoleId,
                     Role = existingRole,
-                    ProfilePicture = new ProfilePicture
-                    {
-                        Link = "https://postimg.cc/CzFkFCXv/af751f02"
-                    }
+                    FkProfilePictureId = 1,
                 };
 
                 context.Accounts.Add(account);

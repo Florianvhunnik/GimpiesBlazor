@@ -31,7 +31,6 @@
         }
 
         await StockManager.AddBrand(new Brand { Name = _brandName });
-        Snackbar.Add("Merk toegevoegd!", Severity.Success);
         MudDialog.Close(DialogResult.Ok(true));
     }
 }

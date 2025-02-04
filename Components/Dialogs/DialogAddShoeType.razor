@@ -31,7 +31,6 @@
         }
 
         await StockManager.AddShoeType(new ShoeType { Name = _typeName });
-        Snackbar.Add("Type toegevoegd!", Severity.Success);
         MudDialog.Close(DialogResult.Ok(true));
     }
 }

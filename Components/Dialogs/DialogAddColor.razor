@@ -29,7 +29,6 @@
         }
 
         await StockManager.AddColor(new GimpiesBlazor.Models.Entities.Color() { Name = _colorName });
-        Snackbar.Add("Kleur toegevoegd!", Severity.Success);
         MudDialog.Close(DialogResult.Ok(true));
     }
 }

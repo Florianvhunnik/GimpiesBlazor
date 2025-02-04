@@ -27,6 +27,7 @@ namespace GimpiesBlazor.Authentication
 
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                 [
+                    new Claim("AccountId", userSession.AccountId.ToString()),
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
                     new Claim(ClaimTypes.Role, userSession.Role),
@@ -51,6 +52,7 @@ namespace GimpiesBlazor.Authentication
 
                 claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
+                    new Claim("AccountId", userSession.AccountId.ToString()),
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
                     new Claim(ClaimTypes.Role, userSession.Role),

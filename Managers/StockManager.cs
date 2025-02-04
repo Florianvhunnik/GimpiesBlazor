@@ -90,17 +90,17 @@ namespace GimpiesBlazor.Managers
             return await context.Colors.ToListAsync();
         }
 
-        public async Task<Brand> GetBrandById(int brandId)
+        public async Task<Brand?> GetBrandById(int brandId)
         {
             return await context.Brands.FirstOrDefaultAsync(b => b.BrandId == brandId);
         }
 
-        public async Task<ShoeType> GetShoeTypeById(int typeId)
+        public async Task<ShoeType?> GetShoeTypeById(int typeId)
         {
             return await context.ShoeTypes.FirstOrDefaultAsync(t => t.ShoeTypeId == typeId);
         }
 
-        public async Task<Color> GetColorById(int colorId)
+        public async Task<Color?> GetColorById(int colorId)
         {
             return await context.Colors.FirstOrDefaultAsync(c => c.ColorId == colorId);
         }
