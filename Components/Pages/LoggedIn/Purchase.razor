@@ -1,0 +1,78 @@
+﻿@page "/purchase"
+@using GimpiesBlazor.Components.Dialogs
+@using GimpiesBlazor.Managers
+@inject ISnackbar Snackbar
+@inject StockManager StockManager
+@inject IDialogService DialogService
+
+<PageTitle>Schoenen Inkopen</PageTitle>
+
+<MudTable Items="_stockList"
+          Hover="true"
+          Loading="@_loadingStock"
+          LoadingProgressColor="MudBlazor.Color.Primary"
+          MultiSelection="true"
+          @bind-SelectedItems="_selectedStock">
+    <HeaderContent>
+        <MudTh>Merk</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Maat</MudTh>
+        <MudTh>Kleur</MudTh>
+        <MudTh>Aantal</MudTh>
+        <MudTh>Prijs</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="stock">
+        <MudTd>@stock.Brand.Name</MudTd>
+        <MudTd>@stock.ShoeType.Name</MudTd>
+        <MudTd>@stock.Size</MudTd>
+        <MudTd>@stock.Color.Name</MudTd>
+        <MudTd>@stock.Count</MudTd>
+        <MudTd>@stock.Price.ToString("C")</MudTd>
+    </RowTemplate>
+</MudTable>
+
+<MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart" OnClick="OpenPurchaseDialog">
+    Inkopen
+</MudButton>
+
+@code {
+    private List<GimpiesBlazor.Models.Entities.Stock> _stockList = new();
+    private HashSet<GimpiesBlazor.Models.Entities.Stock> _selectedStock = new();
+    private bool _loadingStock = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStock();
+    }
+
+    private async Task LoadStock()
+    {
+        _loadingStock = true;
+        _stockList = await StockManager.GetStock();
+        _loadingStock = false;
+    }
+
+    private async Task OpenPurchaseDialog()
+    {
+        if (!_selectedStock.Any())
+        {
+            Snackbar.Add("Selecteer minstens één schoen om in te kopen.", Severity.Warning);
+            return;
+        }
+
+        foreach (var stock in _selectedStock)
+        {
+            var result = await DialogService.ShowAsync<DialogPurchaseShoe>("Inkoop voor " + stock.Brand.Name + " - " + stock.ShoeType.Name);
+            var dialogResult = await result.Result;
+
+            if (!dialogResult.Canceled && int.TryParse(dialogResult.Data.ToString(), out int purchasedQuantity))
+            {
+                stock.Count += purchasedQuantity;
+                await StockManager.UpdateStock(stock);
+                Snackbar.Add($"Inkoop succesvol! {purchasedQuantity} toegevoegd aan voorraad.", Severity.Success);
+            }
+        }
+
+        await LoadStock();
+    }
+}

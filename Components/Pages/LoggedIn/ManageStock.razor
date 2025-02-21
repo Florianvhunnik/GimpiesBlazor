@@ -45,18 +45,18 @@
             </RowTemplate>
             <RowEditingTemplate Context="stock">
                 <MudTd>
-                    <MudSelect T="int" @bind-Value="stock.SelectedBrandId" Required>
+                    <MudSelect T="Brand" @bind-Value="stock.Brand" Required>
                         @foreach (var brand in _brands)
                         {
-                            <MudSelectItem Value="brand.BrandId">@brand.Name</MudSelectItem>
+                            <MudSelectItem Value="brand">@brand.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudSelect T="int" @bind-Value="stock.SelectedShoeTypeId" Required>
+                    <MudSelect T="ShoeType" @bind-Value="stock.ShoeType" Required>
                         @foreach (var shoeType in _shoeTypes)
                         {
-                            <MudSelectItem Value="shoeType.ShoeTypeId">@shoeType.Name</MudSelectItem>
+                            <MudSelectItem Value="shoeType">@shoeType.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </MudTd>
@@ -64,16 +64,17 @@
                     <MudTextField @bind-Value="stock.Size" Required />
                 </MudTd>
                 <MudTd>
-                    <MudSelect T="int" @bind-Value="stock.SelectedColorId" Required>
+                    <MudSelect T="GimpiesBlazor.Models.Entities.Color" @bind-Value="stock.Color" Required>
                         @foreach (var color in _colors)
                         {
-                            <MudSelectItem Value="color.ColorId">@color.Name</MudSelectItem>
+                            <MudSelectItem Value="color">@color.Name</MudSelectItem>
                         }
                     </MudSelect>
                 </MudTd>
                 <MudTd> <MudTextField @bind-Value="stock.Count" Required /> </MudTd>
                 <MudTd> <MudTextField @bind-Value="stock.Price" Required /> </MudTd>
             </RowEditingTemplate>
+
 
             <PagerContent>
                 <MudTablePager />

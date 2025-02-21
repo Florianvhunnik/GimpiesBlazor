@@ -33,14 +33,13 @@
             return;
         }
 
-        var success = await AccountManager.RegisterUserAsync(_username, _email, _password, "user");
+        var (success, error) = await AccountManager.RegisterUserAsync(_username, _email, _password, "user");
         if (!success)
         {
-            Snackbar.Add("Fout bij het aanmaken van het account!", Severity.Error);
+            Snackbar.Add(error, Severity.Error);
         }
         else
         {
-            Snackbar.Add("Nieuw account succesvol aangemaakt!", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
     }

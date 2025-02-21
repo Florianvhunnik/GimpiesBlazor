@@ -112,8 +112,9 @@
 
             NavigationManager.NavigateTo("/dashboard", true);
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException exception)
         {
+            Console.WriteLine(exception);
             Snackbar.Add("Er is een fout opgetreden bij het inloggen!", Severity.Error, options =>
             {
                 options.Action = "Meer info";

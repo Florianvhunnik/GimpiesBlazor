@@ -1,0 +1,112 @@
+﻿@page "/sale"
+@using GimpiesBlazor.Components.Dialogs
+@using GimpiesBlazor.Managers
+@inject ISnackbar Snackbar
+@inject StockManager StockManager
+@inject IDialogService DialogService
+
+<PageTitle>Schoenen Verkopen</PageTitle>
+
+<MudTable Items="_stockList"
+          Hover="true"
+          Loading="@_loadingStock"
+          LoadingProgressColor="MudBlazor.Color.Primary"
+          MultiSelection="true"
+          @bind-SelectedItems="_selectedStock">
+    <HeaderContent>
+        <MudTh>Merk</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Maat</MudTh>
+        <MudTh>Kleur</MudTh>
+        <MudTh>Aantal</MudTh>
+        <MudTh>Prijs</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="stock">
+        <MudTd>@stock.Brand.Name</MudTd>
+        <MudTd>@stock.ShoeType.Name</MudTd>
+        <MudTd>@stock.Size</MudTd>
+        <MudTd>@stock.Color.Name</MudTd>
+        <MudTd>@stock.Count</MudTd>
+        <MudTd>@stock.Price.ToString("C")</MudTd>
+    </RowTemplate>
+</MudTable>
+
+<MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="OpenSaleDialog">
+    Verkopen
+</MudButton>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authStateTask { get; set; } = default!;
+
+    private List<GimpiesBlazor.Models.Entities.Stock> _stockList = new();
+    private HashSet<GimpiesBlazor.Models.Entities.Stock> _selectedStock = new();
+    private bool _loadingStock = false;
+    private int _currentUserAccountId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authStateTask;
+        var user = authState.User;
+        var accountIdClaim = user.FindFirst("AccountId");
+
+        if (accountIdClaim != null)
+        {
+            _currentUserAccountId = int.Parse(accountIdClaim.Value);
+        }     
+
+        await LoadStock();
+    }
+
+    private async Task LoadStock()
+    {
+        _loadingStock = true;
+        _stockList = await StockManager.GetStock();
+        _loadingStock = false;
+    }
+
+    private async Task OpenSaleDialog()
+    {
+        if (!_selectedStock.Any())
+        {
+            Snackbar.Add("Selecteer minstens één schoen om te verkopen.", Severity.Warning);
+            return;
+        }
+
+        foreach (var stock in _selectedStock)
+        {
+            var result = await DialogService.ShowAsync<DialogSale>("Verkoop voor " + stock.Brand.Name + " - " + stock.ShoeType.Name);
+            var dialogResult = await result.Result;
+
+            if (!dialogResult.Canceled && int.TryParse(dialogResult.Data.ToString(), out int soldQuantity))
+            {
+                if (soldQuantity > stock.Count)
+                {
+                    Snackbar.Add($"Niet genoeg voorraad voor {stock.Brand.Name} - {stock.ShoeType.Name}.", Severity.Error);
+                    continue;
+                }
+
+                stock.Count -= soldQuantity;
+                await StockManager.UpdateStock(stock);
+
+                var totalSalePrice = soldQuantity * stock.Price;
+
+                var sale = new GimpiesBlazor.Models.Entities.Sale
+                {
+                    FkStockId = stock.StockId,
+                    FkAccountId = _currentUserAccountId,
+                    NumberSold = soldQuantity,
+                    TotalSalePrice = totalSalePrice,
+                    SaleDate = DateTime.Now,
+                    Stock = stock
+                };
+
+                await StockManager.AddSale(sale);
+
+                Snackbar.Add($"Verkoop succesvol! {soldQuantity} verkocht.", Severity.Success);
+            }
+        }
+
+        await LoadStock();
+    }
+}

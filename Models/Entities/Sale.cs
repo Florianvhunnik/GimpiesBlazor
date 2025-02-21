@@ -21,7 +21,7 @@ namespace GimpiesBlazor.Models.Entities
         
         public DateTime SaleDate { get; set; }
 
-        public virtual required Account Account { get; set; }
+        public virtual Account Account { get; set; }
         public virtual required Stock Stock { get; set; }
     }
 }

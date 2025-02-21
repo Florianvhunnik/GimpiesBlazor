@@ -132,5 +132,18 @@ namespace GimpiesBlazor.Managers
             }
         }
 
+        public async Task<bool> AddSale(Sale sale)
+        {
+            context.Sales.Add(sale);
+            return await context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<Sale>> GetSalesData()
+        {
+            return await context.Sales
+                .Include(s => s.Stock)
+                .ThenInclude(stock => stock.Brand)
+                .ToListAsync();
+        }
     }
 }

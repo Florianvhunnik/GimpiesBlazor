@@ -1,0 +1,19 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="Quantity" Label="Aantal" Type="number" Required />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Submit" Color="Color.Primary">Verkopen</MudButton>
+        <MudButton OnClick="Cancel" Color="Color.Secondary">Annuleren</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private int Quantity { get; set; } = 1;
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(Quantity));
+    private void Cancel() => MudDialog.Cancel();
+}

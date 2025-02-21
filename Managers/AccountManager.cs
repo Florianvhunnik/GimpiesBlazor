@@ -21,10 +21,20 @@ namespace GimpiesBlazor.Managers
             return result == PasswordVerificationResult.Success;
         }
 
-        public async Task<bool> RegisterUserAsync(string username, string email, string password, string role)
+        public async Task<(bool, string)> RegisterUserAsync(string username, string email, string password, string role)
         {
             try
             {
+                var existingAccount = await context.Accounts
+                    .FirstOrDefaultAsync(a =>
+                        EF.Functions.Collate(a.Username, "SQL_Latin1_General_CP1_CI_AS") == username ||
+                        a.Email.ToLower() == email.ToLower());
+
+                if (existingAccount != null)
+                {
+                    return (false, "Een account met deze gebruikersnaam of e-mail bestaat al.");
+                }
+
                 var existingRole = await context.Roles
                     .FirstOrDefaultAsync(r => r.RoleName == role);
 
@@ -52,7 +62,7 @@ namespace GimpiesBlazor.Managers
                 context.Accounts.Add(account);
 
                 var result = await context.SaveChangesAsync();
-                return result > 0;
+                return (result > 0, String.Empty);
             }
             catch (Exception ex)
             {
@@ -65,6 +75,7 @@ namespace GimpiesBlazor.Managers
             try
             {
                 var account = await context.Accounts
+                    .AsNoTracking()
                     .Include(a => a.ProfilePicture)
                     .Include(a => a.Role)
                     .ThenInclude(r => r.RolePermissions)
@@ -73,10 +84,14 @@ namespace GimpiesBlazor.Managers
                         EF.Functions.Collate(a.Username, "SQL_Latin1_General_CP1_CS_AS") == usernameOrEmail ||
                         EF.Functions.Collate(a.Email, "SQL_Latin1_General_CP1_CS_AS") == usernameOrEmail);
 
-                if (account != null && VerifyPassword(account.PasswordHash, password))
-                    return account.IsActive ? (account, true) : (account, false);
+                if (account is null || !account.IsActive)
+                    return (null, true);
 
-                return (null, true);
+                if (VerifyPassword(account.PasswordHash, password))
+                    return (account, true);
+
+                return (null, false);
+
             }
             catch (Exception)
             {
@@ -127,6 +142,11 @@ namespace GimpiesBlazor.Managers
 
             account.IsActive = false;
             return await context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<Role>> GetAllRoles()
+        {
+            return await context.Roles.ToListAsync();
         }
     }
 }

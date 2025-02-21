@@ -1,0 +1,36 @@
+﻿@page "/statistics"
+@using GimpiesBlazor.Managers
+@inject StockManager StockManager
+
+<PageTitle>Verkoopstatistieken</PageTitle>
+
+<MudPaper Elevation="4" Class="p-4">
+    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" />
+    <MudDivider Class="my-4" />
+</MudPaper>
+
+@code {
+    public List<MudBlazor.ChartSeries> Series = new();
+    public string[] XAxisLabels = Array.Empty<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var salesData = await StockManager.GetSalesData();
+
+        var groupedSales = salesData
+            .GroupBy(s => s.Stock.Brand.Name)
+            .Select(g => new { Brand = g.Key, TotalSold = g.Sum(s => s.NumberSold) })
+            .OrderByDescending(g => g.TotalSold)
+            .ToList();
+
+        XAxisLabels = groupedSales.Select(s => s.Brand).ToArray();
+        Series = new List<MudBlazor.ChartSeries>
+        {
+            new MudBlazor.ChartSeries
+            {
+                Name = "Verkochte schoenen",
+                Data = groupedSales.Select(s => (double)s.TotalSold).ToArray()
+            }
+        };
+    }
+}
